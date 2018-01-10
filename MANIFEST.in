@@ -1,0 +1,2 @@
+include LICENSE.txt README.rst CHANGES.txt contributors.txt requirements.txt
+include tlseparation/config/example_config.txt
