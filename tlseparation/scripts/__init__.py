@@ -20,10 +20,10 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.1"
+__version__ = "1.2.1.4"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
 
-from automated_separation import large_tree_1
+from .automated_separation import large_tree_1

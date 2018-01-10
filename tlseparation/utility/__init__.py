@@ -20,15 +20,14 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.1"
+__version__ = "1.2.1.4"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
-
-from continuous_clustering import *
-from knnsearch import *
-from data_utils import *
-from shortpath import *
-from filtering import *
-from cloud_analysis import *
+from .shortpath import (array_to_graph, extract_path_info)
+from .continuous_clustering import path_clustering
+from .knnsearch import *
+from .data_utils import *
+from .filtering import *
+from .cloud_analysis import *

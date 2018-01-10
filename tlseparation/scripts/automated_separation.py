@@ -20,19 +20,18 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.1"
+__version__ = "1.2.1.4"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
 
 import numpy as np
-import sys
-sys.path.append('..')
-from classification import (wlseparate_abs, wlseparate_ref_voting,
-                            detect_main_pathways, get_base)
-from utility import (get_diff, remove_duplicates, radius_filter, class_filter,
-                     cluster_filter, continuity_filter, detect_nn_dist)
+from ..classification import (wlseparate_abs, wlseparate_ref_voting,
+                              detect_main_pathways, get_base)
+from ..utility import (get_diff, remove_duplicates, radius_filter,
+                       class_filter, cluster_filter, continuity_filter,
+                       detect_nn_dist)
 
 
 def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):

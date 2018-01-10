@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.1"
+__version__ = "1.2.1.4"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -28,11 +28,7 @@ __status__ = "Development"
 
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
-import sys
-
-sys.path.append('..')
-
-from utility.shortpath import (array_to_graph, extract_path_info)
+from ..utility.shortpath import (array_to_graph, extract_path_info)
 
 
 def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold):
