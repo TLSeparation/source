@@ -87,14 +87,14 @@ def large_tree_1(arr, class_file=default_class, cont_filt=True, class_prob_thres
         print('Failed to obtain base_mask.')
 
     # Masking points most likely to be part of the trunk and larger branches.
-    #if verbose: print datetime.datetime.now(), ' | masking points most likely to be part of the trunk and larger branches'
-    #try:
-    #    trunk_mask = detect_main_pathways(arr, 80, 100, nndist, verbose=verbose)
-    #    trunk_ids = np.where(trunk_mask)[0]
-    #    not_trunk_ids = np.where(~trunk_mask)[0].astype(int)
-    #except:
-    trunk_ids = []
-    #    print('Failed to obtain trunk_mask.')
+    if verbose: print datetime.datetime.now(), ' | masking points most likely to be part of the trunk and larger branches'
+    try:
+        trunk_mask = detect_main_pathways(arr, 80, 100, nndist, verbose=verbose)
+        trunk_ids = np.where(trunk_mask)[0]
+        not_trunk_ids = np.where(~trunk_mask)[0].astype(int)
+    except:
+        trunk_ids = []
+        print('Failed to obtain trunk_mask.')
 
     ###########################################################################
     try:
