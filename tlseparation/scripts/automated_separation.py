@@ -27,6 +27,8 @@ __status__ = "Development"
 
 
 import numpy as np
+import pandas as pd
+import datetime
 from ..classification import (wlseparate_abs, wlseparate_ref_voting,
                               detect_main_pathways, get_base)
 from ..utility import (get_diff, remove_duplicates, radius_filter,
@@ -36,7 +38,7 @@ from ..utility import (get_diff, remove_duplicates, radius_filter,
 default_class = pd.DataFrame(np.array([['leaf', 1, 0, 0, 0, 0, 0], ['twig', 0, 1, 0, 0, 0.5, 1], ['trunk', 0, 0, 1, 1, 0.5, 1]]), 
                           columns=['class', 0, 1, 2, 3, 4, 5]
 
-def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
+def large_tree_1(arr, class_file=default_class, cont_filt=True, class_prob_threshold=0.95):
 
     """
     Run an automated separation of a single tree point cloud.
@@ -65,14 +67,18 @@ def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
 
     ###########################################################################
     # Making sure input array has only 3 dimensions and no duplicated points.
+    if verbose: print datetime.datetime.now(), ' | removing duplicates'
     arr = remove_duplicates(arr[:, :3])
 
     # Calculating recommended distance between neighboring points.
+    if verbose: print datetime.datetime.now(), ' | calculating recommended distance between neighboring points'
     nndist = detect_nn_dist(arr, 10, 0.5)
+    if verbose: print datetime.datetime.now(), ' | nndist:', nndist
 
     ###########################################################################
     # Obtaining mask of points from a slice of points located at the base of
     # the tree.
+    if verbose: print datetime.datetime.now(), ' | obtaining mask of points from a slice of points located at the base of the tree'
     try:
         base_mask = get_base(arr, 0.5)
         base_ids = np.where(base_mask)[0]
@@ -81,6 +87,7 @@ def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
         print('Failed to obtain base_mask.')
 
     # Masking points most likely to be part of the trunk and larger branches.
+    if verbose: print datetime.datetime.now(), ' | masking points most likely to be part of the trunk and larger branches'
     try:
         trunk_mask = detect_main_pathways(arr, 80, 100, nndist)
         trunk_ids = np.where(trunk_mask)[0]
@@ -91,24 +98,29 @@ def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
 
     ###########################################################################
     try:
+        if verbose: print datetime.datetime.now(), ' | performing absolute threshold separation on points not detected as trunk (not_trunk_ids)'
         # Performing absolute threshold separation on points not detected
         # as trunk (not_trunk_ids).
         ids_1, prob_1 = wlseparate_abs(arr[not_trunk_ids], 40,
                                        n_classes=4)
 
         # Obtaining wood_1 ids and classification probability.
+        if verbose: print datetime.datetime.now(), ' | obtaining wood_1 ids and classification probability'
         wood_1_mask = not_trunk_ids[ids_1['wood']]
         wood_1_prob = prob_1['wood']
         # Filtering out points that were classified with a probability lower
         # than class_prob_threshold.
+        if verbose: print datetime.datetime.now(), ' | filtering out points that were classified with a probability lower than class_prob_threshold'
         wood_1 = wood_1_mask[wood_1_prob >= class_prob_threshold]
 
         try:
             # Applying class_filter to remove wood_1 points that are more
             # likely to be part of a leaf point cloud (not_wood_1).
+            if verbose: print datetime.datetime.now(), ' | applying class_filter to remove wood_1 points that are more likely to be part of a leaf point cloud (not_wood_1)'
             wood_1_1_mask, _ = class_filter(arr[wood_1], arr[~wood_1], 1,
                                             knn=20)
             # Obtaining wood_1 filtered point indices.
+            if verbose: print datetime.datetime.now(), ' | obtaining wood_1 filtered point indices'
             wood_1_1_mask = np.where(wood_1_1_mask)[0]
             wood_1_1 = wood_1[wood_1_1_mask]
         except:
@@ -118,6 +130,7 @@ def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
             # Applying cluster_filter to remove isolated clusters of points in
             # wood_1_1.
             wood_1_2_mask = cluster_filter(arr[wood_1_1], 0.1, 5, 1.5)
+            if verbose: print datetime.datetime.now(), ' | applying cluster_filter to remove isolated clusters of points in wood_1_1'
             # Obtaining indices for final wood_1_* class.
             wood_1_2 = wood_1_1[wood_1_2_mask]
         except:
@@ -126,6 +139,7 @@ def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
     except:
         # In case absolute threshold separation fails, set wood_1_2 as an
         # empty list.
+	if verbose: print datetime.datetime.now(), ' | absolute threshold separation failed, setting wood_1_2 as an empty list'
         wood_1_2 = []
 
     ###########################################################################
@@ -135,6 +149,7 @@ def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
         # Defining list of knn values to use in the voting scheme.
         knn_list = [80, 70, 100, 150]
         # Running reference class voting separation.
+        if verbose: print datetime.datetime.now(), ' | running reference class voting separation'
         ids_2, count_2, prob_2 = wlseparate_ref_voting(arr, knn_list,
                                                        class_file, n_classes=4)
 
@@ -164,6 +179,7 @@ def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
 
         try:
             # Applying radius_filter on filtered twig point cloud.
+            if verbose: print datetime.datetime.now(), ' | applying radius_filter on filtered twig point cloud'
             twig_2_1_mask = radius_filter(arr[twig_2], 0.05, 10)
             twig_2_1 = twig_2[twig_2_1_mask]
         except:
@@ -172,6 +188,7 @@ def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
         try:
             # Applying cluster_filter to remove isolated clusters of points in
             # twig_2_mask.
+            if verbose: print datetime.datetime.now(), ' | applying cluster_filter to remove isolated clusters of points in twig_2_mask'
             twig_2_2_mask = cluster_filter(arr[twig_2_1], 0.1, 20, 3)
             twig_2_2 = twig_2_1[twig_2_2_mask]
         except:
@@ -179,6 +196,7 @@ def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
 
         try:
             # Applying radius_filter to trunk_2 point cloud.
+            if verbose: print datetime.datetime.now(), ' | applying radius_filter to trunk_2 point cloud'
             trunk_2_1_mask = radius_filter(arr[trunk_2], 0.05, 10)
             trunk_2_1 = trunk_2[trunk_2_1_mask]
         except:
@@ -187,6 +205,7 @@ def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
         try:
             # Applying cluster_filter to remove isolated clusters of points in
             # twig_2_mask.
+            if verbose: print datetime.datetime.now(), ' | applying cluster_filter to remove isolated clusters of points in twig_2_mask'
             trunk_2_2_mask = cluster_filter(arr[trunk_2_1], 0.1, 20, 3)
             trunk_2_2 = trunk_2_1[trunk_2_2_mask]
         except:
@@ -206,9 +225,11 @@ def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
     wood = arr[wood_ids]
     # Removing duplicate points from wood point cloud. As there is a lot of
     # overlap in the classification phase, this step is rather necessary.
+    if verbose: print datetime.datetime.now(), ' | removing duplicate points from wood point cloud. As there is a lot of overlap in the classification phase, this step is rather necessary'
     wood = remove_duplicates(wood)
     # Obtaining leaf point cloud from the difference between input cloud 'arr'
     # and wood points.
+    if verbose: print datetime.datetime.now(), ' | obtaining leaf point cloud from the difference between input cloud "arr" and wood points'
     leaf = get_diff(arr, wood)
 
     ###########################################################################
@@ -216,6 +237,7 @@ def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
         # Applying continuity filter in an attempt to close gaps in the wood
         # point cloud (i.e. misclassified leaf points in between portions of
         # wood points).
+        if verbose: print datetime.datetime.now(), ' | applying continuity filter in an attempt to close gaps in the wood point cloud'
         try:
             wood_final, leaf_final = continuity_filter(wood, leaf, rad=nndist)
         except:
