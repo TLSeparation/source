@@ -33,6 +33,8 @@ from ..utility import (get_diff, remove_duplicates, radius_filter,
                        class_filter, cluster_filter, continuity_filter,
                        detect_nn_dist)
 
+default_class = pd.DataFrame(np.array([['leaf', 1, 0, 0, 0, 0, 0], ['twig', 0, 1, 0, 0, 0.5, 1], ['trunk', 0, 0, 1, 1, 0.5, 1]]), 
+                          columns=['class', 0, 1, 2, 3, 4, 5]
 
 def large_tree_1(arr, class_file, cont_filt=True, class_prob_threshold=0.95):
 
