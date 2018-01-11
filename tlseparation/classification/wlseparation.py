@@ -27,7 +27,7 @@ __status__ = "Development"
 
 
 import numpy as np
-from pandas import read_csv
+import pandas as pd
 from sklearn.neighbors import NearestNeighbors
 from ..utility.knnsearch import set_nbrs_knn, subset_nbrs
 from ..classification.point_features import knn_features
@@ -160,7 +160,7 @@ def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3):
 
     # Reading in class reference values from file.
     if isinstance(class_file, str):
-        class_table = read_csv(class_file)
+        class_table = pd.read_csv(class_file)
         print class_table
     elif isinstance(class_file, pd.core.frame.DataFrame):
         class_table = class_file
