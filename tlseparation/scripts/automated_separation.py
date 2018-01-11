@@ -25,7 +25,7 @@ __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
-
+print "using short version"
 import numpy as np
 import pandas as pd
 import datetime
@@ -36,9 +36,9 @@ from ..utility import (get_diff, remove_duplicates, radius_filter,
                        detect_nn_dist)
 
 default_class = pd.DataFrame(np.array([['leaf', 1, 0, 0, 0, 0, 0], ['twig', 0, 1, 0, 0, 0.5, 1], ['trunk', 0, 0, 1, 1, 0.5, 1]]), 
-                          columns=['class', 0, 1, 2, 3, 4, 5]
+                          columns=['class', 0, 1, 2, 3, 4, 5])
 
-def large_tree_1(arr, class_file=default_class, cont_filt=True, class_prob_threshold=0.95):
+def large_tree_1(arr, class_file=default_class, cont_filt=True, class_prob_threshold=0.95, verbose=False):
 
     """
     Run an automated separation of a single tree point cloud.
@@ -87,14 +87,14 @@ def large_tree_1(arr, class_file=default_class, cont_filt=True, class_prob_thres
         print('Failed to obtain base_mask.')
 
     # Masking points most likely to be part of the trunk and larger branches.
-    if verbose: print datetime.datetime.now(), ' | masking points most likely to be part of the trunk and larger branches'
-    try:
-        trunk_mask = detect_main_pathways(arr, 80, 100, nndist, verbose=verbose)
-        trunk_ids = np.where(trunk_mask)[0]
-        not_trunk_ids = np.where(~trunk_mask)[0].astype(int)
-    except:
-        trunk_ids = []
-        print('Failed to obtain trunk_mask.')
+    #if verbose: print datetime.datetime.now(), ' | masking points most likely to be part of the trunk and larger branches'
+    #try:
+    #    trunk_mask = detect_main_pathways(arr, 80, 100, nndist, verbose=verbose)
+    #    trunk_ids = np.where(trunk_mask)[0]
+    #    not_trunk_ids = np.where(~trunk_mask)[0].astype(int)
+    #except:
+    trunk_ids = []
+    #    print('Failed to obtain trunk_mask.')
 
     ###########################################################################
     try:
