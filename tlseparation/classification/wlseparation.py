@@ -127,7 +127,7 @@ def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3):
         knn_lst (list): List of knn values to use in the search to constitue
             local subsets of points around each point in 'arr'. It can be
             a single knn value, as long as it has list data type.
-        class_file (str): Path to reference classes file.
+        class_file (pandas dataframe or str): Dataframe or path to reference classes file.
         n_classes (int): Number of classes to use in the Gaussian Mixture
             Classification.
 
@@ -159,7 +159,13 @@ def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3):
                                     return_dist=True)
 
     # Reading in class reference values from file.
-    class_table = read_csv(class_file)
+    if isinstance(class_file, str):
+        class_table = read_csv(class_file)
+        print class_table
+    elif isinstance(class_file, pd.core.frame.DataFrame):
+        class_table = class_file
+    else:
+        raise Exception('class file should be a pandas dataframe or file path')
     class_ref = np.asarray(class_table.iloc[:, 1:]).astype(float)
 
     # Looping over values of knn in knn_lst.
