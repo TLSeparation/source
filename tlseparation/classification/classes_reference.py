@@ -18,15 +18,28 @@
 
 __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
-__credits__ = ["Matheus Boni Vicari"]
+__credits__ = ["Matheus Boni Vicari", "Phil Wilkes"]
 __license__ = "GPL3"
 __version__ = "1.2.1.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
-__all__ = ['classification', 'utility', 'scripts']
 
-import classification
-import utility
-import scripts
+import numpy as np
+from pandas import DataFrame
+
+
+class DefaultClass:
+
+    """
+    Defines a defaul reference class to be used in classification of
+    tree point clouds.
+
+    """
+
+    def __init__(self):
+        self.ref_table = DataFrame(np.array([['leaf', 1, 0, 0, 0, 0, 0],
+                                             ['twig', 0, 1, 0, 0, 0.5, 1],
+                                             ['trunk', 0, 0, 1, 1, 0.5, 1]]),
+                                   columns=['class', 0, 1, 2, 3, 4, 5])

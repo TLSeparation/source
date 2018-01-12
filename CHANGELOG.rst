@@ -1,11 +1,27 @@
+v1.2.1.5
+--------
+- Added verbose option to some modules.
+- Changed docstrings style to numpydoc.
+- Added default class_ref DataFrame as a built-in object. User now has the option to use this new default or continue to load a
+	.csv file.
+
+
+v1.2.1.4
+--------
+- Fixed imports. Now, to access any low level function, one has to go through the proper module hierarchy.
+
+v1.2.1.3
+--------
+- Changed approach of relative import. Removed all sys.path.append statements and adopted double dots (..) for parent folder imports.
+
 v1.2.1.2
-========
+--------
 
 - Fixed bug in classification.__init__.py failing to import *wlseparate_ref* as this function no longer exists;
 - Updated documentation strings for Sphinx;		
 
 v1.2.1.1
-========
+--------
 This versions has enough important modifications to get a new subversion number, starting the 1.2 phase.
 
 Some of the changes included in this version are:
@@ -23,13 +39,14 @@ Some of the changes included in this version are:
 - Revised documentation for the whole package. Now, all docstrings are compatible with Sphinx;
 
 v1.1.4
-======
+------
 Corrected list of required packages.
 
 v1.1.3
-======
+------
 Added new option for automated separation (auto_separation_2).
 Renamed old separation.py to auto_separation_1.py.
 Added classificaition probability output to gmm.py.
 Added classification probability filter to separation. Now all points below some probability threshold will be left unclassified.
 Added new wlseparate method to auto_separation_2, based on a voting scheme.
+

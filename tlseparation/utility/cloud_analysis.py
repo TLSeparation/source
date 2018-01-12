@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.4"
+__version__ = "1.2.1.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -35,15 +35,20 @@ def detect_rad_nn(arr, rad):
     Calculates an average of number of neighbors based on a fixed radius
     around each point in a point cloud.
 
-    Args:
-        arr (array): Three-dimensional (m x n) array of a point cloud, where
-            the coordinates are represented in the columns (n) and the points
-            are represented in the rows (m).
-        rad (float): Radius distance to select neighboring points.
+    Parameters
+    ----------
+    arr : array
+        Three-dimensional (m x n) array of a point cloud, where the
+        coordinates are represented in the columns (n) and the points are
+        represented in the rows (m).
+    rad : float
+        Radius distance to select neighboring points.
 
     Returns
-        mean_knn (int): Average number of points inside a radius 'rad' around
-            each point in 'arr'.
+    -------
+    mean_knn : int
+        Average number of points inside a radius 'rad' around each point in
+        'arr'.
 
     """
 
@@ -64,14 +69,19 @@ def detect_nn_dist(arr, knn, sigma=1):
     """
     Calcuates the optimum distance among neighboring points.
 
-    Args:
-        arr (array): N-dimensional array (m x n) containing a set of
-            parameters (n) over a set of observations (m).
-        knn (int): Number of nearest neighbors to search to constitue the
-            local subset of points around each point in 'arr'.
+    Parameters
+    ----------
+    arr : array
+        N-dimensional array (m x n) containing a set of parameters (n) over
+        a set of observations (m).
+    knn : int
+        Number of nearest neighbors to search to constitue the local subset
+        of points around each point in 'arr'.
 
-    Returns:
-        dist (float): Optimal distance among neighboring points.
+    Returns
+    -------
+    dist : float
+        Optimal distance among neighboring points.
 
     """
 

@@ -17,12 +17,12 @@ with open('requirements.txt') as f:
 
 setup(
     name="tlseparation",
-    version="1.2.1.4",
+    version="1.2.1.5",
     author='Matheus Boni Vicari',
     author_email='matheus.boni.vicari@gmail.com',
     packages=find_packages(),
     entry_points={
-        'console_scripts': ['tlseparation=tlseparation.command_line:main']},
+	},
     url='https://github.com/mattbv/tlseparation',
     license='LICENSE.txt',
     description='Performs the wood/leaf separation from\

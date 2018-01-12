@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.4"
+__version__ = "1.2.1.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -35,19 +35,24 @@ def classify(variables, n_classes):
     Function to perform the classification of a dataset using sklearn's
     Gaussian Mixture Models with Expectation Maximization.
 
-    Args:
-        variables (array): N-dimensional array (m x n) containing a set of
-             parameters (n) over a set of observations (m).
-        n_classes (int): Number of classes to assign the input variables.
+    Parameters
+    ----------
+    variables : array
+        N-dimensional array (m x n) containing a set of parameters (n)
+        over a set of observations (m).
+    n_classes : int
+        Number of classes to assign the input variables.
 
-    Returns:
-        classes (list): List of classes labels for each observation from the
-            input variables.
-        means (array): N-dimensional array (c x n) of each class (c) parameter
-            space means (n).
-        probability (array): Probability of samples belonging to every class
-             in the classification. Sum of sample-wise probability should be
-             1.
+    Returns
+    -------
+    classes : list
+        List of classes labels for each observation from the input variables.
+    means : array
+        N-dimensional array (c x n) of each class (c) parameter space means
+        (n).
+    probability : array
+        Probability of samples belonging to every class in the classification.
+        Sum of sample-wise probability should be 1.
 
     """
 
@@ -64,17 +69,21 @@ def class_select_ref(classes, cm, classes_ref):
     Selects from the classification results which classes are wood and which
     are leaf.
 
-    Args:
-        classes (list): List of classes labels for each observation from the
-            input variables.
-        cm (array): N-dimensional array (c x n) of each class (c) parameter
-            space mean valuess (n).
-        classes_ref (array): Reference classes values.
+    Parameters
+    ----------
+    classes : list
+        List of classes labels for each observation from the input variables.
+    cm : array
+        N-dimensional array (c x n) of each class (c) parameter space mean
+        valuess (n).
+    classes_ref : array
+        Reference classes values.
 
-
-    Returns:
-        mask (array): List of booleans where True represents wood points and
-            False represents leaf points.
+    Returns
+    -------
+    mask : array
+        List of booleans where True represents wood points and False
+        represents leaf points.
 
     """
 
@@ -111,20 +120,27 @@ def class_select_abs(classes, cm, nbrs_idx, feature=5, threshold=0.5):
     are leaf based on a absolute value threshold from a single feature in
     the parameter space.
 
-    Args:
-        classes (list or array): Classes labels for each observation from the
-            input variables.
-        cm (array): N-dimensional array (c x n) of each class (c) parameter
-            space mean valuess (n).
-        nbrs_idx (array): Nearest Neighbors indices relative to every point
-            of the array that originated the classes labels.
-        feature (int): Column index of the feature to use as constraint.
-        threshold (float): Threshold value to mask classes. All classes with
-            means >= threshold are masked as true.
+    Parameters
+    ----------
+    classes : list or array
+        Classes labels for each observation from the input variables.
+    cm : array
+        N-dimensional array (c x n) of each class (c) parameter space mean
+        valuess (n).
+    nbrs_idx : array
+        Nearest Neighbors indices relative to every point of the array that
+        originated the classes labels.
+    feature : int
+        Column index of the feature to use as constraint.
+    threshold : float
+        Threshold value to mask classes. All classes with means >= threshold
+        are masked as true.
 
-    Returns:
-        mask (list): List of booleans where True represents wood points and
-            False represents leaf points.
+    Returns
+    -------
+    mask : list
+        List of booleans where True represents wood points and False
+        represents leaf points.
 
     """
 

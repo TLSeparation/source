@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.4"
+__version__ = "1.2.1.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -37,12 +37,17 @@ def get_diff(arr1, arr2):
     Performs the intersection of two arrays, returning the entries not
     intersected between arr1 and arr2.
 
-    Args:
-        arr1 (array): N-dimensional array of points to intersect.
-        arr2 (array): N-dimensional array of points to intersect.
+    Parameters
+    ----------
+    arr1 : array
+        N-dimensional array of points to intersect.
+    arr2 : array
+        N-dimensional array of points to intersect.
 
-    Returns:
-        arr (array): Difference array between 'arr1' and 'arr2'.
+    Returns
+    -------
+    arr : array
+        Difference array between 'arr1' and 'arr2'.
 
     """
 
@@ -67,13 +72,17 @@ def remove_duplicates(arr, return_ids=False):
     """
     Removes duplicated rows from an array.
 
-    Args:
-        arr (array): N-dimensional array (m x n) containing a set of
-            parameters (n) over a set of observations (m).
+    Parameters
+    ----------
+    arr : array
+        N-dimensional array (m x n) containing a set of parameters (n) over
+        a set of observations (m).
 
-    Returns:
-        unique (array): N-dimensional array (m* x n) containing a set of
-            unique parameters (n) over a set of unique observations (m*).
+    Returns
+    -------
+    unique : array
+        N-dimensional array (m* x n) containing a set of unique parameters (n)
+        over a set of unique observations (m*).
 
     """
 
@@ -93,18 +102,24 @@ def apply_nn_value(base, arr, attr):
     """
     Upscales a set of attributes from a base array to another denser array.
 
-    Args:
-        base (array): Base array to which the attributes to upscale were
-            originaly matched.
-        arr (array): Target array to which the attributes will be upscaled.
-        attr (array): Attributes to upscale.
+    Parameters
+    ----------
+    base : array
+        Base array to which the attributes to upscale were originaly matched.
+    arr : array
+        Target array to which the attributes will be upscaled.
+    attr : array
+        Attributes to upscale.
 
-    Returns:
-        new_attr (array): Upscales attributes.
+    Returns
+    -------
+    new_attr : array
+        Upscales attributes.
 
-    Raises:
-        AssertionError: length (number of samples) of "base" and "attr" must
-            be equal.
+    Raises
+    ------
+    AssertionError:
+        length (number of samples) of "base" and "attr" must be equal.
 
     """
 
@@ -128,14 +143,18 @@ def entries_to_remove(entries, d):
     """
     Function to remove selected entries (key and respective values) from
     a given dict.
-    Based on a reply from the user mattbornski at stackoverflow.
+    Based on a reply from the user mattbornski [#]_ at stackoverflow.
 
-    Args:
-        entries (array): Set of entried to be removed.
-        d (dict): Dictionary to apply the entried removal.
+    Parameters
+    ----------
+    entries : array
+        Set of entried to be removed.
+    d : dict
+        Dictionary to apply the entried removal.
 
-    Reference:
-    ..  [1] mattbornski, 2012. http://stackoverflow.com/questions/8995611/\
+    References
+    ----------
+    ..  [#] mattbornski, 2012. http://stackoverflow.com/questions/8995611/\
 removing-multiple-keys-from-a-dictionary-safely
 
     """

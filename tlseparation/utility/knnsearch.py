@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.4"
+__version__ = "1.2.1.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -39,20 +39,26 @@ def set_nbrs_knn(arr, pts, knn, return_dist=True, block_size=100000):
     terms of processing time, but avoids running out of memory in cases of
     very dense/large arrays/queries.
 
-    Args:
-        arr (array): N-dimensional array to perform the knn search on.
-        pts (array): N-dimensional array to search for on the knn search.
-        knn (int): Number of nearest neighbors to search for.
-        return_dist (boolean): Option to return or not the distances of each
-            neighbor.
-        block_size (int): Limit of points to query. The variable 'pts' will be
-            subdivided in n blocks of size block_size to perform query.
+    Parameters
+    ----------
+    arr : array
+        N-dimensional array to perform the knn search on.
+    pts : array
+        N-dimensional array to search for on the knn search.
+    knn : int
+        Number of nearest neighbors to search for.
+    return_dist : boolean
+        Option to return or not the distances of each neighbor.
+    block_size : int
+        Limit of points to query. The variable 'pts' will be subdivided in n
+        blocks of size block_size to perform query.
 
-    Returns:
-        indices (array): Set of neighbors indices from 'arr' for each entry in
-            'pts'.
-        distance (array): Distances from each neighbor to each central point
-            in 'pts'.
+    Returns
+    -------
+    indices : array
+        Set of neighbors indices from 'arr' for each entry in 'pts'.
+    distance : array
+        Distances from each neighbor to each central point in 'pts'.
 
     """
 
@@ -105,20 +111,26 @@ def set_nbrs_rad(arr, pts, rad, return_dist=True, block_size=100000):
     in terms of processing time, but avoids running out of memory in cases of
     very dense/large arrays/queries.
 
-    Args:
-        arr (array): N-dimensional array to perform the radius search on.
-        pts (array): N-dimensional array to search for on the knn search.
-        rad (float): Radius of the NearestNeighbors search.
-        return_dist (boolean): Option to return or not the distances of each
-            neighbor.
-        block_size (int): Limit of points to query. The variable 'pts' will be
-            subdivided in n blocks of size block_size to perform query.
+    Parameters
+    ----------
+    arr : array
+        N-dimensional array to perform the radius search on.
+    pts : array
+        N-dimensional array to search for on the knn search.
+    rad : float
+        Radius of the NearestNeighbors search.
+    return_dist : boolean
+        Option to return or not the distances of each neighbor.
+    block_size : int
+        Limit of points to query. The variable 'pts' will be subdivided in n
+        blocks of size block_size to perform query.
 
-    Returns:
-        indices (array): Set of neighbors indices from 'arr' for each entry in
-            'pts'.
-        distance (array): Distances from each neighbor to each central point
-            in 'pts'.
+    Returns
+    -------
+    indices : array
+        Set of neighbors indices from 'arr' for each entry in 'pts'.
+    distance : array
+        Distances from each neighbor to each central point in 'pts'.
 
     """
 
@@ -170,17 +182,21 @@ def subset_nbrs(distance, indices, new_knn):
     Performs a subseting of points from the results of a nearest neighbors
     search.
 
-    Args:
-        distance (array): Distances from each neighbor to each central point
-            in 'pts'.
-        indices (array): Set of neighbors indices from 'arr' for each entry in
-            'pts'.
-        new_knn (array): Number of neighbors to select from the initial number
-            of neighbors.
+    Parameters
+    ----------
+    distance : array
+        Distances from each neighbor to each central point in 'pts'.
+    indices : array
+        Set of neighbors indices from 'arr' for each entry in 'pts'.
+    new_knn : array
+        Number of neighbors to select from the initial number of neighbors.
 
-    Returns:
-        distance (array): Subset of distances from each neighbor 'indices'.
-        indices (array): Subset of neighbors indices from 'indices'.
+    Returns
+    -------
+    distance : array
+        Subset of distances from each neighbor 'indices'.
+    indices : array
+        Subset of neighbors indices from 'indices'.
 
     """
 

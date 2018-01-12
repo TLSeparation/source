@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.4"
+__version__ = "1.2.1.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -39,26 +39,33 @@ def path_clustering(arr, knn, slice_length, cluster_threshold,
     Generates the path clustering of a point cloud with a defined
     root point.
 
-    Args:
-        arr (array): N-dimensional array (m x n) containing a set of
-            parameters (n) over a set of observations (m). In this case, the
-            set of parameters are the point cloud coordinates, where each row
-            represents a point.
-        knn (int): Number of nearest neighbors to use in the reconstruction of
-            point cloud around the generated path nodes. A high value may lead
-            to unnecessary duplication of steps. A low value may lead to gaps
-            in the reconstructed point cloud.
-        slice_length (float): Length of the slices of the data in 'arr'.
-        cluster_threshold (float): Distance threshold to be used as constraint
-            in the slice clustering step.
+    Parameters
+    ----------
+    arr : array
+        N-dimensional array (m x n) containing a set of parameters (n) over
+        a set of observations (m). In this case, the set of parameters are
+        the point cloud coordinates, where each row represents a point.
+    knn : int
+        Number of nearest neighbors to use in the reconstruction of point
+        cloud around the generated path nodes. A high value may lead to
+        unnecessary duplication of steps. A low value may lead to gaps
+        in the reconstructed point cloud.
+    slice_length : float
+        Length of the slices of the data in 'arr'.
+    cluster_threshold : float
+        Distance threshold to be used as constraint in the slice clustering
+        step.
 
-    Returns:
-        wood (array): N-dimensional array (w x n) containing the (w) points
-            classified as wood from the path reconstruction. The columns (n)
-            represents the   3D coordinates of each point.
-        leaf (array): N-dimensional array (l x n) containing the (l) points
-            not classified as wood and, therefore, classified as leaf. The
-            columns (n) represents the 3D coordinates of each point.
+    Returns
+    -------
+    wood : array
+        N-dimensional array (w x n) containing the (w) points classified as
+        wood from the path reconstruction. The columns (n) represents the 3D
+        coordinates of each point.
+    leaf : array
+        N-dimensional array (l x n) containing the (l) points not classified
+        as wood and, therefore, classified as leaf. The columns (n) represents
+        the 3D coordinates of each point.
 
     """
 
@@ -171,22 +178,28 @@ def slice_nodes(arr, slice_length, cluster_threshold):
     based on the shortest path distance of every point from the base.
 
 
-    Args:
-        arr (array): N-dimensional array (m x n) containing a set of
-            parameters (n) over a set of observations (m). In this case, the
-            set of parameters are the point cloud coordinates, where each row
-            represents a point.
-        slice_length (float): Length for the slices of data in 'arr'.
-        cluster_threshold (float): Distance threshold to be used as
-            constraint in the slice clustering step.
+    Parameters
+    ----------
+    arr : array
+        N-dimensional array (m x n) containing a set of parameters (n) over a
+        set of observations (m). In this case, the set of parameters are the
+        point cloud coordinates, where each row represents a point.
+    slice_length : float
+        Length for the slices of data in 'arr'.
+    cluster_threshold : float
+        Distance threshold to be used as constraint in the slice clustering
+        step.
 
-    Returns:
-        cluster_data (dict): Dictionary containing the skeleton nodes
-            coordinates (keys) and the substet of points from 'arr' that
-            generated the respective skeleton nodes.
-        cluster_diameter (dict): Dictionary containing the skeleton nodes
-            coordinates (keys) and the mean diameter of the cluster that
-            generated the respective skeleton nodes.
+    Returns
+    -------
+    cluster_data : dict
+        Dictionary containing the skeleton nodes coordinates (keys) and the
+        substet of points from 'arr' that generated the respective skeleton
+        nodes.
+    cluster_diameter : dict
+        Dictionary containing the skeleton nodes coordinates (keys) and the
+        mean diameter of the cluster that generated the respective skeleton
+        nodes.
 
     """
 
@@ -237,15 +250,19 @@ def central_coord(arr):
     Calculates the central coordinates and mean diameter of an array of
     points in 3D space.
 
-    Args:
-        arr (array): N-dimensional array (m x n) containing a set of
-            parameters (n) over a set of observations (m). In this case, the
-            set of parameters are the point cloud coordinates, where each
-            row represents a point.
+    Parameters
+    ----------
+    arr : array
+        N-dimensional array (m x n) containing a set of parameters (n) over a
+        set of observations (m). In this case, the set of parameters are the
+        point cloud coordinates, where each row represents a point.
 
-    Returns:
-        coord (array): Central coordinates of the points in the input array.
-        diameter (float): Mean diameter of the points in the input array.
+    Returns
+    -------
+    coord : array
+        Central coordinates of the points in the input array.
+    diameter : float
+        Mean diameter of the points in the input array.
 
     """
 
@@ -262,17 +279,20 @@ def data_clustering(point_arr, threshold):
     """
     Clusters point_arr using hierarchical clustering.
 
-    Args:
-        point_arr (array): N-dimensional array (m x n) containing a set of
-            parameters (n) over a set of observations (m). In this case, the
-            set of parameters are the point cloud coordinates, where each row
-            represents a point.
-        threshold (float): Distance threshold to be used as constraint in the
-            slice clustering step.
+    Parameters
+    ----------
+    point_arr : array
+        N-dimensional array (m x n) containing a set of parameters (n) over
+        a set of observations (m). In this case, the set of parameters are
+        the point cloud coordinates, where each row represents a point.
+    threshold : float
+        Distance threshold to be used as constraint in the slice clustering
+        step.
 
-    Returns:
-        clusters.labels_ (array): Set of cluster labels for the classified
-            array.
+    Returns
+    -------
+    clusters.labels_ : array
+        Set of cluster labels for the classified array.
 
     """
 
