@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.4"
+__version__ = "1.2.1.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -40,23 +40,28 @@ def cluster_filter(arr, max_dist, min_points, eval_threshold):
     Applies a cluster filter to a point cloud 'arr'. This filter aims to
     remove small, isolated, clusters of points.
 
-    Args:
-        arr (array): Point cloud of shape n points x m dimensions to be
-            filtered.
-        max_dist (float): Maximum distance between pairs of points for them
-            to be considered as part of the same cluster. Also related to
-            minimum distance between clusters.
-        min_points (int): Minimum number of points in a cluster. Points that
-            are part of clusters with less than min_points are filtered out.
-        eval_threshold (float): Minimum value for largest eigenvalue for a
-            valid cluster. This value is an indication of cluster shape,
-            in which the higher the eigenvalue, more elongated is the cluster.
-            Points from clusters that have eigenvalue smaller then
-            eval_threshold are filtered out.
+    Parameters
+    ----------
+    arr : array
+        Point cloud of shape n points x m dimensions to be filtered.
+    max_dist : float
+        Maximum distance between pairs of points for them to be considered as
+        part of the same cluster. Also related to minimum distance between
+        clusters.
+    min_points : int
+        Minimum number of points in a cluster. Points that are part of
+        clusters with less than min_points are filtered out.
+    eval_threshold : float
+        Minimum value for largest eigenvalue for a valid cluster. This value
+        is an indication of cluster shape, in which the higher the eigenvalue,
+        more elongated is the cluster. Points from clusters that have
+        eigenvalue smaller then eval_threshold are filtered out.
 
-    Returns:
-        mask (array): Boolean mask of filtered points. Entries are set as
-            True if belonging to a valid cluster and False otherwise.
+    Returns
+    -------
+    mask : array
+        Boolean mask of filtered points. Entries are set as True if belonging
+        to a valid cluster and False otherwise.
 
     """
 
@@ -91,16 +96,21 @@ def radius_filter(arr, radius, min_points):
     Applies a radius search filter, which remove isolated points/clusters of
     points.
 
-    Args:
-        arr (array): Point cloud of shape n points x m dimensions to be
-            filtered.
-        radius (float): Search radius around each point to form a neighborhood.
-        min_point (int): Minimum number of points in a neighborhood for it
-            to be considered valid, i.e not filtered out.
+    Parameters
+    ----------
+    arr : array
+        Point cloud of shape n points x m dimensions to be filtered.
+    radius : float
+        Search radius around each point to form a neighborhood.
+    min_point : int
+        Minimum number of points in a neighborhood for it to be considered
+        valid, i.e not filtered out.
 
-    Returns:
-        mask (array): Array of bools masking valid points as True and
-            "noise" points as False.
+    Returns
+    -------
+    mask : array
+        Array of bools masking valid points as True and "noise" points as
+        False.
 
     """
 
@@ -129,16 +139,22 @@ def continuity_filter(wood, leaf, rad=0.05):
     or missclassified leaf data. In this sense, this function tries to correct
     gaps where leaf points are present.
 
-    Args:
-        wood (array): Wood point cloud to be filtered.
-        leaf (array): Leaf point cloud, with points that may be causing
-            discontinuities in the wood point cloud.
-        rad (float): Radius to search for neighboring points in the iterative
-            process.
+    Parameters
+    ----------
+    wood : array
+        Wood point cloud to be filtered.
+    leaf : array
+        Leaf point cloud, with points that may be causing discontinuities in
+        the wood point cloud.
+    rad : float
+        Radius to search for neighboring points in the iterative process.
 
-    Returns:
-        wood (array): Filtered wood point cloud.
-        not_wood (array): Remaining point clouds after the filtering.
+    Returns
+    -------
+    wood : array
+        Filtered wood point cloud.
+    not_wood : array
+        Remaining point clouds after the filtering.
 
     """
 
@@ -225,24 +241,31 @@ def array_majority(arr_1, arr_2, **kwargs):
     """
     Applies majority filter on two arrays.
 
-    Args:
-        arr_1 (array): n-dimensional array of points to filter.
-        arr_2 (array): n-dimensional array of points to filter.
-        **kwargs: knn, rad.
-        knn (int or float): Number neighbors to select around each point in
-            arr in order to apply the majority criteria.
-        rad (int or float): Search radius arount each point in arr to select
-            neighbors in order to apply the majority criteria.
+    Parameters
+    ----------
+    arr_1 : array
+        n-dimensional array of points to filter.
+    arr_2 : array
+        n-dimensional array of points to filter.
+    **knn : int or float
+        Number neighbors to select around each point in arr in order to apply
+        the majority criteria.
+    **rad : int or float
+        Search radius arount each point in arr to select neighbors in order
+        to apply the majority criteria.
 
-    Returns:
-        c_maj_1 (array): Boolean mask of filtered entries of same class as
-            input 'arr_1'.
-        c_maj_2 (array): Boolean mask of filtered entries of same class as
-            input 'arr_2'.
+    Returns
+    -------
+    c_maj_1 : array
+        Boolean mask of filtered entries of same class as input 'arr_1'.
+    c_maj_2 : array
+        Boolean mask of filtered entries of same class as input 'arr_2'.
 
-    Raises:
-        AssertionError: Raised if neither 'knn' or 'rad' arguments are passed
-            with valid values (int or float).
+    Raises
+    ------
+    AssertionError:
+        Raised if neither 'knn' or 'rad' arguments are passed with valid
+        values (int or float).
 
     """
 
@@ -304,28 +327,35 @@ def class_filter(arr_1, arr_2, target, **kwargs):
     classed from both arrays (arr_1 and arr_2). Which array gets filtered
     is defined by ''target''.
 
-    Args:
-        arr_1 (array): n-dimensional array of points to filter.
-        arr_2 (array): n-dimensional array of points to filter.
-        target (int or float): number of the input array to filter. Valid
-            values are 0 or 1.
-        **kwargs: knn, rad.
-        knn (int or float): Number neighbors to select around each point in
-            arr in order to apply the majority criteria.
-        rad (int or float): Search radius arount each point in arr to select
-            neighbors in order to apply the majority criteria.
+    Parameters
+    ----------
+    arr_1 : array
+        n-dimensional array of points to filter.
+    arr_2 : array
+        n-dimensional array of points to filter.
+    target : int or float
+        Number of the input array to filter. Valid values are 0 or 1.
+    **knn : int or float
+        Number neighbors to select around each point in arr in order to apply
+        the majority criteria.
+    **rad : int or float
+        Search radius arount each point in arr to select neighbors in order
+        to apply the majority criteria.
 
-    Returns:
-        c_maj_1 (array): Boolean mask of filtered entries of same class as
-            input 'arr_1'.
-        c_maj_2 (array): Boolean mask of filtered entries of same class as
-            input 'arr_2'.
+    Returns
+    -------
+    c_maj_1 : array
+        Boolean mask of filtered entries of same class as input 'arr_1'.
+    c_maj_2 : array
+        Boolean mask of filtered entries of same class as input 'arr_2'.
 
-    Raises:
-        AssertionError: Raised if neither 'knn' or 'rad' arguments are passed
-            with valid values (int or float).
-        AssertionError: Raised if 'target' variable is not an int or float with
-            value 0 or 1.
+    Raises
+    ------
+    AssertionError:
+        Raised if neither 'knn' or 'rad' arguments are passed with valid
+        values (int or float).
+    AssertionError:
+        Raised if 'target' variable is not an int or float with value 0 or 1.
 
     """
 
@@ -393,24 +423,30 @@ def dist_majority(arr_1, arr_2, **kwargs):
     """
     Applies majority filter on two arrays.
 
-    Args:
-        arr_1 (array): n-dimensional array of points to filter.
-        arr_2 (array): n-dimensional array of points to filter.
-        **kwargs: knn, rad.
-        knn (int or float): Number neighbors to select around each point in
-            arr in order to apply the majority criteria.
-        rad (int or float): Search radius arount each point in arr to select
-            neighbors in order to apply the majority criteria.
+    Parameters
+    ----------
+    arr_1 : array
+        n-dimensional array of points to filter.
+    arr_2 : array
+        n-dimensional array of points to filter.
+    **knn : int or float
+        Number neighbors to select around each point in arr in order to apply
+        the majority criteria.
+    **rad : int or float
+        Search radius arount each point in arr to select neighbors in order to
+        apply the majority criteria.
 
-    Returns:
-        c_maj_1 (array): Boolean mask of filtered entries of same class as
-            input 'arr_1'.
-        c_maj_2 (array): Boolean mask of filtered entries of same class as
-            input 'arr_2'.
+    Returns
+    -------
+    c_maj_1 : array
+        Boolean mask of filtered entries of same class as input 'arr_1'.
+    c_maj_2 : array
+        Boolean mask of filtered entries of same class as input 'arr_2'.
 
     Raises:
-        AssertionError: Raised if neither 'knn' or 'rad' arguments are passed
-            with valid values (int or float).
+    AssertionError:
+        Raised if neither 'knn' or 'rad' arguments are passed with valid
+        values (int or float).
 
     """
 

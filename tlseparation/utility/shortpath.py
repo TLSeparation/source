@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.4"
+__version__ = "1.2.1.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -42,24 +42,32 @@ def array_to_graph(arr, base_id, kpairs, knn, nbrs_threshold,
     have a common edge.
 
 
-    Args:
-        arr (array): n-dimensional array of points.
-        base_id (int): index of base id (root) in the graph.
-        kpairs (int): number of points around each point in arr to select in
-            order to build edges.
-        knn (int): Number of neighbors to search around each point in the
-            neighborhood phase. The higher the better (careful, it's  memory
-            intensive).
-        nbrs_threshold (float): Maximum valid distance between neighbors
-            points.
-        nbrs_threshold_step (float): Distance increment used in the final
-            phase of edges generation. It's used to make sure that in the
-            end, every point in arr will be translated to nodes in the graph.
-        graph_threshold (float): Maximum distance between pairs of nodes
-            (edge distance) accepted in the graph generation.
+    Parameters
+    ----------
+    arr : array
+        n-dimensional array of points.
+    base_id : int
+        Index of base id (root) in the graph.
+    kpairs : int
+        Number of points around each point in arr to select in order to
+        build edges.
+    knn : int
+        Number of neighbors to search around each point in the neighborhood
+        phase. The higher the better (careful, it's  memory intensive).
+    nbrs_threshold : float
+        Maximum valid distance between neighbors points.
+    nbrs_threshold_step : float
+        Distance increment used in the final phase of edges generation. It's
+        used to make sure that in the end, every point in arr will be
+        translated to nodes in the graph.
+    graph_threshold : float
+        Maximum distance between pairs of nodes (edge distance) accepted in
+        the graph generation.
 
-    Returns:
-        G (networkx graph): Graph containing all points in 'arr' as nodes.
+    Returns
+    -------
+    G : networkx graph
+        Graph containing all points in 'arr' as nodes.
 
     """
 
@@ -194,20 +202,27 @@ def extract_path_info(G, base_id, return_path=True):
     """
     Extracts shortest path information from a NetworkX graph.
 
-    Args:
-        G (networkx graph): NetworkX graph object from which to extract
-            the information.
-        base_id (int): Base (root) node id to calculate the shortest path for
-            all other nodes.
-        return_path (boolean): Option to select if function should output
-            path list for every node in G to base_id.
+    Parameters
+    ----------
+    G : networkx graph
+        NetworkX graph object from which to extract the information.
+    base_id : int
+        Base (root) node id to calculate the shortest path for all other
+        nodes.
+    return_path : boolean
+        Option to select if function should output path list for every node
+        in G to base_id.
 
-    Returns:
-        nodes_ids (list): Indices of all nodes in graph G.
-        distance (list): Shortest path distance (accumulated) from all
-            nodes in G to base_id node.
-        path_list (dict): Dictionary of nodes that comprises the path of
-            every node in G to base_id node.
+    Returns
+    -------
+    nodes_ids : list
+        Indices of all nodes in graph G.
+    distance : list
+        Shortest path distance (accumulated) from all nodes in G to base_id
+        node.
+    path_list : dict
+        Dictionary of nodes that comprises the path of every node in G to
+        base_id node.
 
     """
 
@@ -236,17 +251,20 @@ def add_nodes(G, base_node, indices, distance, threshold):
     between base_node and all entries in indices. Each node pair shares an
     edge with weight equal to the distance between both nodes.
 
-    Args:
-        G (networkx graph): NetworkX graph object to which all nodes/edges
-            will be added.
-        base_node (int): Base node's id to be added. All other nodes will
-            be paired with base_node to form different edges.
-        indices (list or array): Set of nodes indices to be paired with
-            base_node.
-        distance (list or array): Set of distances between all nodes in
-            'indices' and base_node.
-        threshold (float): Edge distance threshold. All edges with distance
-            larger than 'threshold' will not be added to G.
+    Parameters
+    ----------
+    G : networkx graph
+        NetworkX graph object to which all nodes/edges will be added.
+    base_node : int
+        Base node's id to be added. All other nodes will be paired with
+        base_node to form different edges.
+    indices : list or array
+        Set of nodes indices to be paired with base_node.
+    distance : list or array
+        Set of distances between all nodes in 'indices' and base_node.
+    threshold : float
+        Edge distance threshold. All edges with distance larger than
+        'threshold' will not be added to G.
 
     """
 

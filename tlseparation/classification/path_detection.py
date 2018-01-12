@@ -18,9 +18,9 @@
 
 __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
-__credits__ = ["Matheus Boni Vicari"]
+__credits__ = ["Matheus Boni Vicari", "Phil Wilkes"]
 __license__ = "GPL3"
-__version__ = "1.2.1.4"
+__version__ = "1.2.1.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -33,35 +33,45 @@ from sklearn.neighbors import NearestNeighbors
 from ..utility.shortpath import (array_to_graph, extract_path_info)
 
 
+
 def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold, voxel=.1, verbose=False):
+
 
     """
     Detects the main pathways of an unordered 3D point cloud. Set as true
     all points detected as part of all detected pathways that down to the
     base of the graph.
 
-    Args:
-        point_cloud (array): Three-dimensional point cloud of a single tree to
-            perform the wood-leaf separation. This should be a n-dimensional
-            array (m x n) containing a set of coordinates (n) over a set of
-            points (m).
-        k_retrace (int): Number of steps in the graph to retrace back to
-            graph's base. Every node in graph will be moved  k_retrace steps
-            from the extremities towards to base.
-        knn (int): Number of neighbors to fill gaps in detected paths. The
-            larger the better. A large knn will increase memory usage.
-            Recommended value between 50 and 150.
-        nbrs_threshold (float): Maximum distance to valid neighboring
-            points used to fill gaps in detected paths.
+    Parameters
+    ----------
+    point_cloud : array
+        Three-dimensional point cloud of a single tree to perform the
+        wood-leaf separation. This should be a n-dimensional array (m x n)
+        containing a set of coordinates (n) over a set of points (m).
+    k_retrace : int
+        Number of steps in the graph to retrace back to graph's base. Every
+        node in graph will be moved  k_retrace steps from the extremities
+        towards to base.
+    knn : int
+        Number of neighbors to fill gaps in detected paths. The larger the
+        better. A large knn will increase memory usage. Recommended value
+        between 50 and 150.
+    nbrs_threshold : float
+        Maximum distance to valid neighboring points used to fill gaps in
+        detected paths.
+    verbose: bool
+        Option to set verbose on/off.
 
-    Returns:
-        path_mask (array): Boolean mask where 'True' represents points
-            detected as part of the main pathways and 'False' represents
-            points not part of the pathways.
+    Returns
+    -------
+    path_mask : array
+        Boolean mask where 'True' represents points detected as part of the
+        main pathways and 'False' represents points not part of the pathways.
 
-    Raises:
-        AssertionError: point_cloud has the wrong shape or number of
-            dimensions.
+    Raises
+    ------
+    AssertionError:
+        point_cloud has the wrong shape or number of dimensions.
 
     """
 
@@ -94,8 +104,12 @@ def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold, voxel=.1, 
 
     # Generating graph from point cloud and extracting shortest path
     # information.
-    if verbose: print datetime.datetime.now(), ' | >>> generating graph from point cloud and extracting shortest path information'
+
+    if verbose:
+        print(str(datetime.datetime.now()) + ' | >>> generating graph from \
+point cloud and extracting shortest path information')
     G = array_to_graph(point_cloud_w[['xx', 'yy', 'zz']], base_id, 3, 100, 0.05, 0.02)
+
     nodes_ids, D, path_list = extract_path_info(G, base_id,
                                                 return_path=True)
     # Obtaining nodes coordinates from shortest path information.
@@ -123,7 +137,10 @@ def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold, voxel=.1, 
 
     # Initializing NearestNeighbors search and searching for all 'knn'
     # neighboring points arround each point in 'arr'.
-    if verbose: print datetime.datetime.now(), ' | >>> initializing NearestNeighbors search and searching for all knn neighboring points arround each point in arr'
+    if verbose:
+        print(str(datetime.datetime.now()) + ' | >>> initializing \
+NearestNeighbors search and searching for all knn neighboring points \
+arround each point in arr')
     nbrs = NearestNeighbors(n_neighbors=knn, metric='euclidean',
                             leaf_size=15, n_jobs=-1).fit(point_cloud_w[['xx', 'yy', 'zz']])
     distances, indices = nbrs.kneighbors(point_cloud_w[['xx', 'yy', 'zz']])
@@ -135,7 +152,9 @@ def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold, voxel=.1, 
     processed_idx = ids
 
     # Looping while there are still indices in current_idx to process.
-    if verbose: print datetime.datetime.now(), ' | >>> looping while there are still indices in current_idx to process'
+    if verbose:
+        print(str(datetime.datetime.now()) + ' | >>> looping while there \
+are still indices in current_idx to process')
     while len(current_idx) > 0:
 
         # Selecting NearestNeighbors indices and distances for current
@@ -225,7 +244,10 @@ def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold, voxel=.1, 
     # knn points that have alreay been added/processed (mask).
     # Also, to ensure continuity over next iteration, select another
     # kpairs points from indices that haven't been processed (~mask).
-    if verbose: print datetime.datetime.now(), ' | >>> looping over current indicess set of nn points and selecting knn points that have alreay been added/processed (mask)'
+    if verbose:
+        print(str(datetime.datetime.now()) + ' | >>> looping over current \
+indicess set of nn points and selecting knn points that have alreay been \
+added/processed (mask)')
     for i, n in enumerate(nn):
         nn_idx = n[mask[i]][1:]
 
@@ -264,15 +286,19 @@ def get_base(point_cloud, base_height):
     """
     Get the base of a point cloud based on a certain height from the bottom.
 
-    Args:
-        point_cloud (array): Three-dimensional point cloud of a single tree to
-            perform the wood-leaf separation. This should be a n-dimensional
-            array (m x n) containing a set of coordinates (n) over a set of
-            points (m).
-        base_height (float): Height of the base slice to mask.
+    Parameters
+    ----------
+    point_cloud : array
+        Three-dimensional point cloud of a single tree to perform the
+        wood-leaf separation. This should be a n-dimensional array (m x n)
+        containing a set of coordinates (n) over a set of points (m).
+    base_height : float
+        Height of the base slice to mask.
 
-    Returns:
-        mask (array): Base slice masked as True.
+    Returns
+    -------
+    mask : array
+        Base slice masked as True.
 
     """
 

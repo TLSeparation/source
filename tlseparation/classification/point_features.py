@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.4"
+__version__ = "1.2.1.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -34,19 +34,24 @@ def knn_features(arr, nbr_idx, block_size=200000):
     Calculates geometric descriptors: salient features and tensor features
     from an array and an indexing with fixed numbers of neighbors.
 
-    Args:
-        arr (array): Three-dimensional (m x n) array of a point cloud, where
-            the coordinates are represented in the columns (n) and the points
-            are represented in the rows (m).
-        nbr_idx (array): N-dimensional array of indices from a nearest
-            neighbors search of the point cloud in 'arr', where the rows (m)
-            represents the points in 'arr' and the columns represents the
-            indices of the nearest neighbors from 'arr'.
+    Parameters
+    ----------
+    arr : array
+        Three-dimensional (m x n) array of a point cloud, where the
+        coordinates are represented in the columns (n) and the points are
+        represented in the rows (m).
+    nbr_idx : array
+        N-dimensional array of indices from a nearest neighbors search of the
+        point cloud in 'arr', where the rows (m) represents the points in
+        'arr' and the columns represents the indices of the nearest neighbors
+        from 'arr'.
 
-    Returns:
-        features (array): N-dimensional array (m x 6) of the calculated
-            geometric descriptors. Where the rows (m) represent the points
-            from 'arr' and the columns represents the features.
+    Returns
+    -------
+    features : array
+        N-dimensional array (m x 6) of the calculated geometric descriptors.
+        Where the rows (m) represent the points from 'arr' and the columns
+        represents the features.
 
     """
 
@@ -89,17 +94,20 @@ def knn_evals(arr_stack):
     """
     Calculates eigenvalues of a stack of arrays.
 
-    Args:
-        arr_stack (array): N-dimensional array (l x m x n) containing a
-            stack of data, where the rows (m) represents the points
-            coordinates, the columns (n) represents the axis coordinates and
-            the layer (l) represents the stacks of points.
+    Parameters
+    ----------
+    arr_stack : array
+        N-dimensional array (l x m x n) containing a stack of data, where the
+        rows (m) represents the points coordinates, the columns (n) represents
+        the axis coordinates and the layer (l) represents the stacks of points.
 
-    Returns:
-        evals (array): N-dimensional array (l x n) of eigenvalues calculated
-            from 'arr_stack'. The rows (l) represents the stack layers of
-            points in 'arr_stack' and the columns (n) represent the parameters
-            in 'arr_stack'.
+    Returns
+    -------
+    evals : array
+        N-dimensional array (l x n) of eigenvalues calculated from
+        'arr_stack'. The rows (l) represents the stack layers of points in
+        'arr_stack' and the columns (n) represent the parameters in
+        'arr_stack'.
 
     """
 
@@ -116,22 +124,27 @@ def calc_features(e):
 
     """
     Calculates the geometric features using a set of eigenvalues, based on Ma
-    et al. (2015) and Wang et al. (2015).
+    et al. [#]_ and Wang et al. [#]_.
 
-    Args:
-        e (array): N-dimensional array (m x 3) containing sets of 3
-            eigenvalues per row (m).
+    Parameters
+    ----------
+    e : array
+        N-dimensional array (m x 3) containing sets of 3 eigenvalues per
+        row (m).
 
-    Returns:
-        features (array): N-dimensional array (m x 6) containing the
-            calculated geometric features from 'e'.
+    Returns
+    -------
+    features : array
+        N-dimensional array (m x 6) containing the calculated geometric
+        features from 'e'.
 
-    Reference:
-    ..  [1] Ma et al., 2015. Improved Salient Feature-Based Approach for
+    References
+    ----------
+    ..  [#] Ma et al., 2015. Improved Salient Feature-Based Approach for
             Automatically Separating Photosynthetic and Nonphotosynthetic
             Components Within Terrestrial Lidar Point Cloud Data of Forest
             Canopies.
-    ..  [2] Wang et al., 2015. A Multiscale and Hierarchical Feature Extraction
+    ..  [#] Wang et al., 2015. A Multiscale and Hierarchical Feature Extraction
             Method for Terrestrial Laser Scanning Point Cloud Classification.
 
     """
@@ -155,21 +168,26 @@ def vectorized_app(arr_stack):
     """
     Function to calculate the covariance of a stack of arrays. This function
     uses einstein summation to make the covariance calculation more efficient.
-    Based on a reply from the user Divakar at stackoverflow.
+    Based on a reply from the user Divakar [#]_ at stackoverflow.
 
-    Args:
-        arr_stack (array): N-dimensional array (l x m x n) containing a stack
-            of data, where the rows (m) represents the points coordinates, the
-            columns (n) represents the axis coordinates and the layer (l)
-            represents the stacks of points.
+    Parameters
+    ----------
+    arr_stack : array
+        N-dimensional array (l x m x n) containing a stack of data, where the
+        rows (m) represents the points coordinates, the columns (n) represents
+        the axis coordinates and the layer (l) represents the stacks of
+        points.
 
-    Returns:
-        cov (array): N-dimensional array (l x n x n) of covariance values
-            calculated from 'arr_stack'. Each layer (l) contains a (n x n)
-            covariance matrix calculated from the layers (l) in 'arr_stack'.
+    Returns
+    -------
+    cov : array
+        N-dimensional array (l x n x n) of covariance values calculated from
+        'arr_stack'. Each layer (l) contains a (n x n) covariance matrix
+        calculated from the layers (l) in 'arr_stack'.
 
-    Reference:
-    ..  [1] Divakar, 2016. http://stackoverflow.com/questions/35756952/\
+    References
+    ----------
+    ..  [#] Divakar, 2016. http://stackoverflow.com/questions/35756952/\
 quickly-compute-eigenvectors-for-each-element-of-an-array-in-\
 python.
 
@@ -188,13 +206,17 @@ def svd_evals(arr):
     """
     Calculates eigenvalues of an array using SVD.
 
-    Args:
-        arr (array): nxm numpy.ndarray where n is the number of samples and
-            m is the number of dimensions.
+    Parameters
+    ----------
+    arr : array
+        nxm numpy.ndarray where n is the number of samples and m is the number
+        of dimensions.
 
-    Returns:
-        evals (array): 1xm numpy.ndarray containing the calculated eigenvalues
-            in decrescent order.
+    Returns
+    -------
+    evals : array
+        1xm numpy.ndarray containing the calculated eigenvalues in decrescent
+        order.
 
     """
 

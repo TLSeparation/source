@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.4"
+__version__ = "1.2.1.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -41,16 +41,23 @@ def fill_class(arr1, arr2, noclass, k):
     Assigns noclass entries to either arr1 or arr2, depending on
     neighborhood majority analisys.
 
-    Args:
-        arr1 (array): Point coordinates for entries of the first class.
-        arr2 (array): Point coordinates for entries of the second class.
-        noclass (array): Point coordinates for noclass entries.
-        k (int): Number of neighbors to use in the neighborhood majority
-            analysis.
+    Parameters
+    ----------
+    arr1 : array
+        Point coordinates for entries of the first class.
+    arr2 : array
+        Point coordinates for entries of the second class.
+    noclass : array
+        Point coordinates for noclass entries.
+    k : int
+        Number of neighbors to use in the neighborhood majority analysis.
 
-    Returns:
-        arr1 (array): Point coordinates for entries of the first class.
-        arr2 (array): Point coordinates for entries of the second class.
+    Returns
+    -------
+    arr1 : array
+        Point coordinates for entries of the first class.
+    arr2 : array
+        Point coordinates for entries of the second class.
 
     """
 
@@ -119,28 +126,32 @@ def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3):
     to reference classes. The closes reference class gets assignes to each
     intermediate class.
 
-    Args:
-        arr (array): Three-dimensional point cloud of a single tree to perform
-            the wood-leaf separation. This should be a n-dimensional array
-            (m x n) containing a set of coordinates (n) over a set of points
-            (m).
-        knn_lst (list): List of knn values to use in the search to constitue
-            local subsets of points around each point in 'arr'. It can be
-            a single knn value, as long as it has list data type.
-        class_file (pandas dataframe or str): Dataframe or path to reference classes file.
-        n_classes (int): Number of classes to use in the Gaussian Mixture
-            Classification.
+    Parameters
+    ----------
+    arr : array
+        Three-dimensional point cloud of a single tree to perform the
+        wood-leaf separation. This should be a n-dimensional array (m x n)
+        containing a set of coordinates (n) over a set of points (m).
+    knn_lst : list
+        List of knn values to use in the search to constitue local subsets of
+        points around each point in 'arr'. It can be a single knn value, as
+        long as it has list data type.
+    class_file : pandas dataframe or str
+        Dataframe or path to reference classes file.
+    n_classes : int
+        Number of classes to use in the Gaussian Mixture Classification.
 
-    Returns:
-        class_dict (dict): Dictionary containing indices for all classes
-            in class_ref. Classes are labeled according to classes names in
-            class_file.
-        count_dict (dict): Dictionary containin votes count for all classes
-            in class_ref. Classes are labeled according to classes names in
-            class_file.
-        prob_dict (dict): Dictionary containing probabilities for all classes
-            in class_ref. Classes are labeled according to classes names in
-            class_file.
+    Returns
+    -------
+    class_dict : dict
+        Dictionary containing indices for all classes in class_ref. Classes
+        are labeled according to classes names in class_file.
+    count_dict : dict
+        Dictionary containin votes count for all classes in class_ref. Classes
+        are labeled according to classes names in class_file.
+    prob_dict : dict
+        Dictionary containing probabilities for all classes in class_ref.
+        Classes are labeled according to classes names in class_file.
 
     """
 
@@ -255,26 +266,30 @@ def wlseparate_abs(arr, knn, knn_downsample=1, n_classes=3):
     Class selection will mask points with feature value larger than a given
     threshold as wood and the remaining points as leaf.
 
-    Args:
-        arr (array): Three-dimensional point cloud of a single tree to perform
-            the wood-leaf separation. This should be a n-dimensional array
-            (m x n) containing a set of coordinates (n) over a set of points
-            (m).
-        knn (int): Number of nearest neighbors to search to constitue the
-            local subset of points around each point in 'arr'.
-        knn_downsample (float): Downsample factor (0, 1) for the knn
-            parameter. If less than 1, a sample of size (knn * knn_downsample)
-            will be selected from the nearest neighbors indices. This option
-            aims to maintain the spatial representation of the local subsets
-            of points, but reducing overhead in memory and processing time.
-        n_classes (int): Number of classes to use in the Gaussian Mixture
-            Classification.
+    Parameters
+    ----------
+    arr : array
+        Three-dimensional point cloud of a single tree to perform the
+        wood-leaf separation. This should be a n-dimensional array (m x n)
+        containing a set of coordinates (n) over a set of points (m).
+    knn : int
+        Number of nearest neighbors to search to constitue the local subset of
+        points around each point in 'arr'.
+    knn_downsample : float
+        Downsample factor (0, 1) for the knn parameter. If less than 1, a
+        sample of size (knn * knn_downsample) will be selected from the
+        nearest neighbors indices. This option aims to maintain the spatial
+        representation of the local subsets of points, but reducing overhead
+        in memory and processing time.
+    n_classes : int
+        Number of classes to use in the Gaussian Mixture Classification.
 
-    Returns:
-        class_indices (dict): Dictionary containing indices for wood and leaf
-            classes.
-        class_probability (dict): Dictionary containing probabilities for wood
-            and leaf classes.
+    Returns
+    -------
+    class_indices : dict
+        Dictionary containing indices for wood and leaf classes.
+    class_probability : dict
+        Dictionary containing probabilities for wood and leaf classes.
 
 
     """
