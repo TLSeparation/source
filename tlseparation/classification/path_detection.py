@@ -25,9 +25,6 @@ __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
-
-print "voxel version"
-
 import numpy as np
 import datetime
 import pandas as pd
