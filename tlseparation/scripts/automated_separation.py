@@ -101,10 +101,14 @@ from a slice of points located at the base of the tree')
     # Masking points most likely to be part of the trunk and larger branches.
     if verbose:
         print(str(datetime.datetime.now()) + ' | masking points most likely \
-to be part of the trunk and larger branches')
+to be part of the trunk and larger branches')    
+    try:
+        trunk_mask = detect_main_pathways(arr, 80, 20, .15, voxel=.1, verbose=verbose)
+
     try:
         trunk_mask = detect_main_pathways(arr, 80, 100, nndist,
                                           verbose=verbose)
+
         trunk_ids = np.where(trunk_mask)[0]
         not_trunk_ids = np.where(~trunk_mask)[0].astype(int)
     except:

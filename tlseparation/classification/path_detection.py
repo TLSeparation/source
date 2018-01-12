@@ -25,15 +25,17 @@ __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
-
-import datetime
 import numpy as np
+import datetime
+import pandas as pd
+import struct
 from sklearn.neighbors import NearestNeighbors
 from ..utility.shortpath import (array_to_graph, extract_path_info)
 
 
-def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold,
-                         verbose=False):
+
+def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold, voxel=.1, verbose=False):
+
 
     """
     Detects the main pathways of an unordered 3D point cloud. Set as true
@@ -80,19 +82,38 @@ def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold,
     assert point_cloud.shape[1] == 3, "point_cloud must be a 3D point cloud.\
  Make sure it has the shape n_points x 3 (x, y, z)."
 
+    # voxelise the data
+    point_cloud_v = pd.DataFrame(point_cloud, columns=['x', 'y', 'z'])
+    point_cloud_v.loc[:, 'xx'] = (point_cloud_v.x // voxel) * voxel
+    point_cloud_v.loc[:, 'yy'] = (point_cloud_v.y // voxel) * voxel
+    point_cloud_v.loc[:, 'zz'] = (point_cloud_v.z // voxel) * voxel
+    
+    point_cloud_v.loc[:, 'xxb'] = point_cloud_v.xx.apply(lambda x: struct.pack('f', x ))
+    point_cloud_v.loc[:, 'yyb'] = point_cloud_v.yy.apply(lambda x: struct.pack('f', x ))
+    point_cloud_v.loc[:, 'zzb'] = point_cloud_v.zz.apply(lambda x: struct.pack('f', x ))
+    point_cloud_v.loc[:, 'I'] = point_cloud_v.xxb + point_cloud_v.yyb + point_cloud_v.zzb
+
+    point_cloud_w = point_cloud_v.groupby(['xx', 'yy', 'zz']).size().reset_index()
+    point_cloud_w.loc[:, 'xxb'] = point_cloud_w.xx.apply(lambda x: struct.pack('f', x ))
+    point_cloud_w.loc[:, 'yyb'] = point_cloud_w.yy.apply(lambda x: struct.pack('f', x ))
+    point_cloud_w.loc[:, 'zzb'] = point_cloud_w.zz.apply(lambda x: struct.pack('f', x ))
+    point_cloud_w.loc[:, 'I'] = point_cloud_w.xxb + point_cloud_w.yyb + point_cloud_w.zzb
+    
     # Getting root index (base_id) from point cloud.
-    base_id = np.argmin(point_cloud[:, 2])
+    base_id = point_cloud_w.zz.idxmin()
 
     # Generating graph from point cloud and extracting shortest path
     # information.
+
     if verbose:
         print(str(datetime.datetime.now()) + ' | >>> generating graph from \
 point cloud and extracting shortest path information')
-    G = array_to_graph(point_cloud, base_id, 3, 100, 0.05, 0.02)
+    G = array_to_graph(point_cloud_w[['xx', 'yy', 'zz']], base_id, 3, 100, 0.05, 0.02)
+
     nodes_ids, D, path_list = extract_path_info(G, base_id,
                                                 return_path=True)
     # Obtaining nodes coordinates from shortest path information.
-    nodes = point_cloud[nodes_ids]
+    nodes = point_cloud_w.loc[nodes_ids]
     # Converting list of shortest path distances to array.
     D = np.asarray(D)
 
@@ -111,8 +132,8 @@ point cloud and extracting shortest path information')
 
     # Generating array of all indices from 'arr' and all indices to process
     # 'idx'.
-    idx_base = np.arange(point_cloud.shape[0], dtype=int)
-    idx = np.arange(point_cloud.shape[0], dtype=int)
+    idx_base = np.arange(point_cloud_w.shape[0], dtype=int)
+    idx = np.arange(point_cloud_w.shape[0], dtype=int)
 
     # Initializing NearestNeighbors search and searching for all 'knn'
     # neighboring points arround each point in 'arr'.
@@ -121,8 +142,8 @@ point cloud and extracting shortest path information')
 NearestNeighbors search and searching for all knn neighboring points \
 arround each point in arr')
     nbrs = NearestNeighbors(n_neighbors=knn, metric='euclidean',
-                            leaf_size=15, n_jobs=-1).fit(point_cloud)
-    distances, indices = nbrs.kneighbors(point_cloud)
+                            leaf_size=15, n_jobs=-1).fit(point_cloud_w[['xx', 'yy', 'zz']])
+    distances, indices = nbrs.kneighbors(point_cloud_w[['xx', 'yy', 'zz']])
     indices = indices.astype(int)
 
     # Initializing variables for current ids being processed (current_idx)
@@ -251,14 +272,14 @@ added/processed (mask)')
     processed_idx = np.unique(processed_idx).astype(int)
 
     # Generating list of remaining proints to process.
-    idx = idx_base[np.in1d(idx_base, processed_idx, invert=True)]
-
-    # Generating final path mask and setting processed indices as True.
-    path_mask = np.zeros(point_cloud.shape[0], dtype=bool)
+    path_mask = np.zeros(point_cloud_w.shape[0], dtype=bool)
     path_mask[processed_idx] = True
+    
+    # identifying points in stem voxels and attributing True
+    path_mask_all = np.zeros(point_cloud_v.shape[0], dtype=bool)
+    path_mask_all[point_cloud_v[point_cloud_v.I.isin(point_cloud_w.loc[path_mask].I)].index] = True
 
-    return path_mask
-
+    return path_mask_all
 
 def get_base(point_cloud, base_height):
 
