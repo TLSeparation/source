@@ -18,17 +18,42 @@
 
 __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
-__credits__ = ["Matheus Boni Vicari"]
+__credits__ = ["Matheus Boni Vicari", "Phil Wilkes"]
 __license__ = "GPL3"
 __version__ = "1.2.1.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
-from .shortpath import (array_to_graph, extract_path_info)
-from .continuous_clustering import path_clustering
-from .knnsearch import *
-from .data_utils import *
-from .filtering import *
-from .cloud_analysis import *
-from .voxels import *
+
+from collections import defaultdict
+
+
+def voxelize_cloud(arr, voxel_size):
+
+    """
+    Generates a dictionary of voxels containing their central coordinates
+    and indices of points belonging to each voxel.
+
+    Parameters
+    ----------
+    arr: array
+        Array of points/entries to voxelize.
+    voxel_size: float
+        Length of all voxels sides/edges.
+
+    Returns
+    -------
+    vox: defaultdict
+        Dictionary containing voxels. Keys are voxels' central coordinates and
+        values are indices of points in arr inside each voxel.
+
+    """
+
+    voxels_ids = (arr / voxel_size).astype(int) * voxel_size
+    vox = defaultdict(list)
+
+    for i, v in enumerate(voxels_ids):
+        vox[tuple(v)].append(i)
+
+    return vox

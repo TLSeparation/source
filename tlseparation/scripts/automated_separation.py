@@ -31,7 +31,7 @@ from ..classification import (wlseparate_abs, wlseparate_ref_voting,
                               detect_main_pathways, get_base, DefaultClass)
 from ..utility import (get_diff, remove_duplicates, radius_filter,
                        class_filter, cluster_filter, continuity_filter,
-                       detect_nn_dist)
+                       detect_nn_dist, voxelize_cloud)
 
 
 def large_tree_1(arr, class_file=[], cont_filt=True,
@@ -101,15 +101,27 @@ from a slice of points located at the base of the tree')
     # Masking points most likely to be part of the trunk and larger branches.
     if verbose:
         print(str(datetime.datetime.now()) + ' | masking points most likely \
-to be part of the trunk and larger branches')    
+to be part of the trunk and larger branches')
     try:
-        trunk_mask = detect_main_pathways(arr, 80, 20, .15, voxel=.1, verbose=verbose)
+        # Voxelizing cloud:
+        vox = voxelize_cloud(arr, voxel_size=.1)
+        vox_coords = np.asarray(vox.keys())
 
-    try:
-        trunk_mask = detect_main_pathways(arr, 80, 100, nndist,
-                                          verbose=verbose)
+        # Using detect_main_pathways on voxels coordinates.
+        trunk_mask_voxel = detect_main_pathways(vox_coords, 80, 100, .15,
+                                                verbose=verbose)
+        # Obtaining indices of point in arr that are inside voxels masked as
+        # trunk (True) in trunk_mask_voxel.
+        trunk_ids = np.unique([j for i in vox_coords[trunk_mask_voxel] for
+                               j in vox[tuple(i)]])
 
-        trunk_ids = np.where(trunk_mask)[0]
+        # Setting up trunk mask, as its opposite represents points not
+        # detected as trunk.
+        trunk_mask = np.zeros(arr.shape[0], dtype=bool)
+        trunk_mask[trunk_ids] = True
+
+        # Obtaining indices of points that were not detected as part of the
+        # trunk.
         not_trunk_ids = np.where(~trunk_mask)[0].astype(int)
     except:
         trunk_ids = []
@@ -217,7 +229,7 @@ voting separation')
             if verbose:
                 print(str(datetime.datetime.now()) + ' | applying \
 radius_filter on filtered twig point cloud')
-            twig_2_1_mask = radius_filter(arr[twig_2], 0.05, 10)
+            twig_2_1_mask = radius_filter(arr[twig_2], 0.2, 5)
             twig_2_1 = twig_2[twig_2_1_mask]
         except:
             twig_2_1 = twig_2
@@ -228,7 +240,7 @@ radius_filter on filtered twig point cloud')
             if verbose:
                 print(str(datetime.datetime.now()) + ' | applying \
 cluster_filter to remove isolated clusters of points in twig_2_mask')
-            twig_2_2_mask = cluster_filter(arr[twig_2_1], 0.1, 20, 3)
+            twig_2_2_mask = cluster_filter(arr[twig_2_1], 0.1, 10, 3)
             twig_2_2 = twig_2_1[twig_2_2_mask]
         except:
             twig_2_2 = twig_2_1
@@ -238,7 +250,7 @@ cluster_filter to remove isolated clusters of points in twig_2_mask')
             if verbose:
                 print(str(datetime.datetime.now()) + ' | applying \
 radius_filter to trunk_2 point cloud')
-            trunk_2_1_mask = radius_filter(arr[trunk_2], 0.05, 10)
+            trunk_2_1_mask = radius_filter(arr[trunk_2], 0.2, 5)
             trunk_2_1 = trunk_2[trunk_2_1_mask]
         except:
             trunk_2_1 = trunk_2
@@ -249,7 +261,7 @@ radius_filter to trunk_2 point cloud')
             if verbose:
                 print(str(datetime.datetime.now()) + ' | applying \
 cluster_filter to remove isolated clusters of points in twig_2_mask')
-            trunk_2_2_mask = cluster_filter(arr[trunk_2_1], 0.1, 20, 3)
+            trunk_2_2_mask = cluster_filter(arr[trunk_2_1], 0.05, 10, 3)
             trunk_2_2 = trunk_2_1[trunk_2_2_mask]
         except:
             trunk_2_2 = trunk_2_1
@@ -289,7 +301,8 @@ from the difference between input cloud "arr" and wood points')
             print(str(datetime.datetime.now()) + ' | applying continuity \
 filter in an attempt to close gaps in the wood point cloud')
         try:
-            wood_final, leaf_final = continuity_filter(wood, leaf, rad=nndist)
+            wood_final, leaf_final = continuity_filter(wood, leaf,
+                                                       rad=nndist*1.2)
         except:
             wood_final = wood
             leaf_final = leaf

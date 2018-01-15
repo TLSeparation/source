@@ -25,14 +25,15 @@ __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
-
-import datetime
 import numpy as np
+import datetime
+import pandas as pd
+import struct
 from sklearn.neighbors import NearestNeighbors
 from ..utility.shortpath import (array_to_graph, extract_path_info)
 
 
-def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold,
+def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold, voxel=.1,
                          verbose=False):
 
     """
@@ -80,19 +81,39 @@ def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold,
     assert point_cloud.shape[1] == 3, "point_cloud must be a 3D point cloud.\
  Make sure it has the shape n_points x 3 (x, y, z)."
 
+    # Voxelise the data.
+    pcloud_v = pd.DataFrame(point_cloud, columns=['x', 'y', 'z'])
+    pcloud_v.loc[:, 'xx'] = (pcloud_v.x // voxel) * voxel
+    pcloud_v.loc[:, 'yy'] = (pcloud_v.y // voxel) * voxel
+    pcloud_v.loc[:, 'zz'] = (pcloud_v.z // voxel) * voxel
+
+    pcloud_v.loc[:, 'xxb'] = pcloud_v.xx.apply(lambda x: struct.pack('f', x))
+    pcloud_v.loc[:, 'yyb'] = pcloud_v.yy.apply(lambda x: struct.pack('f', x))
+    pcloud_v.loc[:, 'zzb'] = pcloud_v.zz.apply(lambda x: struct.pack('f', x))
+    pcloud_v.loc[:, 'I'] = pcloud_v.xxb + pcloud_v.yyb + pcloud_v.zzb
+
+    pcloud_w = pcloud_v.groupby(['xx', 'yy', 'zz']).size().reset_index()
+    pcloud_w.loc[:, 'xxb'] = pcloud_w.xx.apply(lambda x: struct.pack('f', x))
+    pcloud_w.loc[:, 'yyb'] = pcloud_w.yy.apply(lambda x: struct.pack('f', x))
+    pcloud_w.loc[:, 'zzb'] = pcloud_w.zz.apply(lambda x: struct.pack('f', x))
+    pcloud_w.loc[:, 'I'] = pcloud_w.xxb + pcloud_w.yyb + pcloud_w.zzb
+
     # Getting root index (base_id) from point cloud.
-    base_id = np.argmin(point_cloud[:, 2])
+    base_id = pcloud_w.zz.idxmin()
 
     # Generating graph from point cloud and extracting shortest path
     # information.
+
     if verbose:
         print(str(datetime.datetime.now()) + ' | >>> generating graph from \
 point cloud and extracting shortest path information')
-    G = array_to_graph(point_cloud, base_id, 3, knn, nbrs_threshold, 0.02)
+    G = array_to_graph(pcloud_w[['xx', 'yy', 'zz']], base_id, 3, 100, 0.05,
+                       0.02)
+
     nodes_ids, D, path_list = extract_path_info(G, base_id,
                                                 return_path=True)
     # Obtaining nodes coordinates from shortest path information.
-    nodes = point_cloud[nodes_ids]
+    nodes = pcloud_w.loc[nodes_ids]
     # Converting list of shortest path distances to array.
     D = np.asarray(D)
 
@@ -111,8 +132,8 @@ point cloud and extracting shortest path information')
 
     # Generating array of all indices from 'arr' and all indices to process
     # 'idx'.
-    idx_base = np.arange(point_cloud.shape[0], dtype=int)
-    idx = np.arange(point_cloud.shape[0], dtype=int)
+    idx_base = np.arange(pcloud_w.shape[0], dtype=int)
+    idx = np.arange(pcloud_w.shape[0], dtype=int)
 
     # Initializing NearestNeighbors search and searching for all 'knn'
     # neighboring points arround each point in 'arr'.
@@ -121,8 +142,9 @@ point cloud and extracting shortest path information')
 NearestNeighbors search and searching for all knn neighboring points \
 arround each point in arr')
     nbrs = NearestNeighbors(n_neighbors=knn, metric='euclidean',
-                            leaf_size=15, n_jobs=-1).fit(point_cloud)
-    distances, indices = nbrs.kneighbors(point_cloud)
+                            leaf_size=15, n_jobs=-1).fit(pcloud_w[['xx', 'yy',
+                                                                   'zz']])
+    distances, indices = nbrs.kneighbors(pcloud_w[['xx', 'yy', 'zz']])
     indices = indices.astype(int)
 
     # Initializing variables for current ids being processed (current_idx)
@@ -251,23 +273,25 @@ added/processed (mask)')
     processed_idx = np.unique(processed_idx).astype(int)
 
     # Generating list of remaining proints to process.
-    idx = idx_base[np.in1d(idx_base, processed_idx, invert=True)]
-
-    # Generating final path mask and setting processed indices as True.
-    path_mask = np.zeros(point_cloud.shape[0], dtype=bool)
+    path_mask = np.zeros(pcloud_w.shape[0], dtype=bool)
     path_mask[processed_idx] = True
 
-    return path_mask
+    # identifying points in stem voxels and attributing True
+    path_mask_all = np.zeros(pcloud_v.shape[0], dtype=bool)
+    path_mask_all[pcloud_v[
+            pcloud_v.I.isin(pcloud_w.loc[path_mask].I)].index] = True
+
+    return path_mask_all
 
 
-def get_base(point_cloud, base_height):
+def get_base(pcloud, base_height):
 
     """
     Get the base of a point cloud based on a certain height from the bottom.
 
     Parameters
     ----------
-    point_cloud : array
+    pcloud : array
         Three-dimensional point cloud of a single tree to perform the
         wood-leaf separation. This should be a n-dimensional array (m x n)
         containing a set of coordinates (n) over a set of points (m).
@@ -281,4 +305,4 @@ def get_base(point_cloud, base_height):
 
     """
 
-    return point_cloud[:, 2] <= base_height
+    return pcloud[:, 2] <= base_height

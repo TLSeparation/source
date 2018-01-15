@@ -4,6 +4,8 @@ v1.2.1.5
 - Changed docstrings style to numpydoc.
 - Added default class_ref DataFrame as a built-in object. User now has the option to use this new default or continue to load a
 	.csv file.
+- Added voxels.py module to create voxels from point clouds.
+- Added voxelization step in automated_separation.large_tree_1 to improve performance in path_detection.
 
 
 v1.2.1.4
