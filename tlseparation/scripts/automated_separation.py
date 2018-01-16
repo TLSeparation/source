@@ -31,7 +31,7 @@ from ..classification import (wlseparate_abs, wlseparate_ref_voting,
                               detect_main_pathways, get_base, DefaultClass)
 from ..utility import (get_diff, remove_duplicates, radius_filter,
                        class_filter, cluster_filter, continuity_filter,
-                       detect_nn_dist, voxelize_cloud)
+                       detect_nn_dist, voxelize_cloud, detect_optimal_knn)
 
 
 def large_tree_1(arr, class_file=[], cont_filt=True,
@@ -76,13 +76,16 @@ def large_tree_1(arr, class_file=[], cont_filt=True,
         print(str(datetime.datetime.now()) + ' | removing duplicates')
     arr = remove_duplicates(arr[:, :3])
 
-    # Calculating recommended distance between neighboring points.
+    # Calculating recommended distance between neighboring points and optimal
+    # knn values.
     if verbose:
         print(str(datetime.datetime.now()) + ' | calculating recommended \
 distance between neighboring points')
     nndist = detect_nn_dist(arr, 10, 0.5)
+    knn_lst = detect_optimal_knn(arr)
     if verbose:
         print(str(datetime.datetime.now()) + ' | nndist: %s' % nndist)
+        print(str(datetime.datetime.now()) + ' | knn_lst: %s' % knn_lst)
 
     ###########################################################################
     # Obtaining mask of points from a slice of points located at the base of
@@ -134,7 +137,7 @@ to be part of the trunk and larger branches')
 threshold separation on points not detected as trunk (not_trunk_ids)')
         # Performing absolute threshold separation on points not detected
         # as trunk (not_trunk_ids).
-        ids_1, prob_1 = wlseparate_abs(arr[not_trunk_ids], 40,
+        ids_1, prob_1 = wlseparate_abs(arr[not_trunk_ids], np.min(knn_lst),
                                        n_classes=4)
 
         # Obtaining wood_1 ids and classification probability.
@@ -171,7 +174,7 @@ filtered point indices')
         try:
             # Applying cluster_filter to remove isolated clusters of points in
             # wood_1_1.
-            wood_1_2_mask = cluster_filter(arr[wood_1_1], 0.1, 20, 0.2)
+            wood_1_2_mask = cluster_filter(arr[wood_1_1], 0.1, 10, 0.3)
             if verbose:
                 print(str(datetime.datetime.now()) + ' | applying \
 cluster_filter to remove isolated clusters of points in wood_1_1')
@@ -191,13 +194,11 @@ separation failed, setting wood_1_2 as an empty list')
     try:
         # Performing reference class voting separation on the whole input point
         # cloud.
-        # Defining list of knn values to use in the voting scheme.
-        knn_list = [80, 70, 100, 150]
         # Running reference class voting separation.
         if verbose:
             print(str(datetime.datetime.now()) + ' | running reference class \
 voting separation')
-        ids_2, count_2, prob_2 = wlseparate_ref_voting(arr, knn_list,
+        ids_2, count_2, prob_2 = wlseparate_ref_voting(arr, knn_lst,
                                                        class_file, n_classes=4)
 
         # Obtaining indices and classification probabilities for classes
@@ -229,7 +230,7 @@ voting separation')
             if verbose:
                 print(str(datetime.datetime.now()) + ' | applying \
 radius_filter on filtered twig point cloud')
-            twig_2_1_mask = radius_filter(arr[twig_2], 0.2, 5)
+            twig_2_1_mask = radius_filter(arr[twig_2], 0.1, 5)
             twig_2_1 = twig_2[twig_2_1_mask]
         except:
             twig_2_1 = twig_2
@@ -240,7 +241,7 @@ radius_filter on filtered twig point cloud')
             if verbose:
                 print(str(datetime.datetime.now()) + ' | applying \
 cluster_filter to remove isolated clusters of points in twig_2_mask')
-            twig_2_2_mask = cluster_filter(arr[twig_2_1], 0.05, 20, 0.2)
+            twig_2_2_mask = cluster_filter(arr[twig_2_1], 0.05, 10, 0.3)
             twig_2_2 = twig_2_1[twig_2_2_mask]
         except:
             twig_2_2 = twig_2_1
@@ -250,7 +251,7 @@ cluster_filter to remove isolated clusters of points in twig_2_mask')
             if verbose:
                 print(str(datetime.datetime.now()) + ' | applying \
 radius_filter to trunk_2 point cloud')
-            trunk_2_1_mask = radius_filter(arr[trunk_2], 0.2, 5)
+            trunk_2_1_mask = radius_filter(arr[trunk_2], 0.1, 5)
             trunk_2_1 = trunk_2[trunk_2_1_mask]
         except:
             trunk_2_1 = trunk_2
@@ -261,7 +262,7 @@ radius_filter to trunk_2 point cloud')
             if verbose:
                 print(str(datetime.datetime.now()) + ' | applying \
 cluster_filter to remove isolated clusters of points in twig_2_mask')
-            trunk_2_2_mask = cluster_filter(arr[trunk_2_1], 0.05, 20, 0.2)
+            trunk_2_2_mask = cluster_filter(arr[trunk_2_1], 0.05, 10, 0.3)
             trunk_2_2 = trunk_2_1[trunk_2_2_mask]
         except:
             trunk_2_2 = trunk_2_1

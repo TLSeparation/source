@@ -27,6 +27,64 @@ __status__ = "Development"
 
 import numpy as np
 from knnsearch import (set_nbrs_knn, set_nbrs_rad)
+from peakdetect import peakdet
+
+
+def detect_optimal_knn(arr, rad_lst=[0.1, 0.2, 0.3], sample_size=10000):
+
+    """
+    Detects optimal values for knn in order to facilitate material separation.
+
+    Parameters
+    ----------
+    arr: array
+        Set of 3D points.
+    rad_lst: list
+        Set of radius values to generate samples of neighborhoods. This is
+        used to select points to calculate a number of neighboring points
+        distribution from the point cloud.
+    sample_size: int
+        Number of points in arr to process in order to genrate a distribution.
+
+    Returns
+    -------
+    knn_lst: list
+        Set of k-nearest neighbors values.
+
+    """
+
+    # Generating sample indices.
+    sids = np.random.choice(np.arange(arr.shape[0]), sample_size,
+                            replace=False)
+
+    # Obtaining nearest neighbors' indices and distance for sampled points.
+    # This process is done just once, with the largest value of radius in
+    # rad_lst. Later on, it is possible to subsample indices by limiting
+    # their distances for a smaller radius.
+    dist, ids = set_nbrs_rad(arr, arr[sids], np.max(rad_lst), True)
+
+    # Initializing empty list to store knn values.
+    knn_lst = []
+
+    # Looping over each radius value.
+    for r in rad_lst:
+        # Counting number of points inside radius r.
+        n_pts = [len(i[d <= r]) for i, d in zip(ids, dist)]
+
+        # Binning n_pts into a histogram.
+        y, x = np.histogram(n_pts)
+
+        # Detecting peaks of accumulated points from n_pts.
+        maxtab, mintab = peakdet(y, 100)
+        maxtab = np.array(maxtab)
+
+        # Appending knn values relative to peaks detected in n_pts.
+        knn_lst.append(x[maxtab[:, 0]])
+
+    # Flattening nested lists into a final list of knn values.
+    knn_lst = [i for j in knn_lst for i in j]
+
+    return knn_lst
 
 
 def detect_rad_nn(arr, rad):

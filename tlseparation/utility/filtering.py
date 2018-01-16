@@ -34,7 +34,7 @@ from hdbscan import HDBSCAN
 from ..classification.point_features import svd_evals
 
 
-def cluster_filter(arr, max_dist, min_points, eval_threshold):
+def cluster_filter(arr, min_points, eval_threshold):
 
     """
     Applies a cluster filter to a point cloud 'arr'. This filter aims to

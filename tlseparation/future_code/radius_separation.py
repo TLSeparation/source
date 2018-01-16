@@ -31,6 +31,21 @@ from classification.point_features import calc_features
 from numba import jit
 
 
+def features_radius(arr, r):
+
+    print('Initializing NearestNeighbors.\n')
+    idx = set_nbrs_rad(arr, arr, 0.1, False)
+
+    final_evals = np.zeros([arr.shape[0], 3])
+
+    for i, pts in enumerate(idx):
+        if len(pts) >= 3:
+            final_evals[i, :] = svd_evals(arr[pts])
+
+    return final_evals
+
+
+
 @jit
 def features_radius(arr, r):
 
