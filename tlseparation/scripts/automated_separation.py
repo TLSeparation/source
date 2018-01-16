@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari", "Phil Wilkes"]
 __license__ = "GPL3"
-__version__ = "1.2.1.5"
+__version__ = "1.2.1.7"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -171,7 +171,7 @@ filtered point indices')
         try:
             # Applying cluster_filter to remove isolated clusters of points in
             # wood_1_1.
-            wood_1_2_mask = cluster_filter(arr[wood_1_1], 0.1, 5, 1.5)
+            wood_1_2_mask = cluster_filter(arr[wood_1_1], 0.1, 20, 0.2)
             if verbose:
                 print(str(datetime.datetime.now()) + ' | applying \
 cluster_filter to remove isolated clusters of points in wood_1_1')
@@ -240,7 +240,7 @@ radius_filter on filtered twig point cloud')
             if verbose:
                 print(str(datetime.datetime.now()) + ' | applying \
 cluster_filter to remove isolated clusters of points in twig_2_mask')
-            twig_2_2_mask = cluster_filter(arr[twig_2_1], 0.1, 10, 3)
+            twig_2_2_mask = cluster_filter(arr[twig_2_1], 0.05, 20, 0.2)
             twig_2_2 = twig_2_1[twig_2_2_mask]
         except:
             twig_2_2 = twig_2_1
@@ -261,7 +261,7 @@ radius_filter to trunk_2 point cloud')
             if verbose:
                 print(str(datetime.datetime.now()) + ' | applying \
 cluster_filter to remove isolated clusters of points in twig_2_mask')
-            trunk_2_2_mask = cluster_filter(arr[trunk_2_1], 0.05, 10, 3)
+            trunk_2_2_mask = cluster_filter(arr[trunk_2_1], 0.05, 20, 0.2)
             trunk_2_2 = trunk_2_1[trunk_2_2_mask]
         except:
             trunk_2_2 = trunk_2_1
@@ -302,7 +302,7 @@ from the difference between input cloud "arr" and wood points')
 filter in an attempt to close gaps in the wood point cloud')
         try:
             wood_final, leaf_final = continuity_filter(wood, leaf,
-                                                       rad=nndist*1.2)
+                                                       rad=nndist)
         except:
             wood_final = wood
             leaf_final = leaf

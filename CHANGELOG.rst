@@ -1,3 +1,13 @@
+v1.2.1.7
+--------
+- Changed clustering in filtering.cluster_filter from DBSCAN to HDBSCAN in order to improve memory efficiency.
+- Minor adjustments in automated_separation.large_tree_1.
+
+
+v1.2.1.6
+--------
+- Minor fixes.
+
 v1.2.1.5
 --------
 - Added verbose option to some modules.

@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.5"
+__version__ = "1.2.1.7"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -30,7 +30,7 @@ from knnsearch import (set_nbrs_knn, set_nbrs_rad)
 from data_utils import (get_diff, remove_duplicates)
 from shortpath import (array_to_graph, extract_path_info)
 from sklearn.neighbors import NearestNeighbors
-from sklearn.cluster import DBSCAN
+from hdbscan import HDBSCAN
 from ..classification.point_features import svd_evals
 
 
@@ -44,10 +44,6 @@ def cluster_filter(arr, max_dist, min_points, eval_threshold):
     ----------
     arr : array
         Point cloud of shape n points x m dimensions to be filtered.
-    max_dist : float
-        Maximum distance between pairs of points for them to be considered as
-        part of the same cluster. Also related to minimum distance between
-        clusters.
     min_points : int
         Minimum number of points in a cluster. Points that are part of
         clusters with less than min_points are filtered out.
@@ -65,8 +61,8 @@ def cluster_filter(arr, max_dist, min_points, eval_threshold):
 
     """
 
-    # Initializing and fitting DBSCAN clustering to input array 'arr'.
-    clusterer = DBSCAN(eps=max_dist, n_jobs=-1).fit(arr)
+    # Initializing and fitting HDBSCAN clustering to input array 'arr'.
+    clusterer = HDBSCAN(min_points).fit(arr)
     labels = clusterer.labels_
 
     # Initializing arrat of final eigenvalues for each cluster.
@@ -78,13 +74,11 @@ def cluster_filter(arr, max_dist, min_points, eval_threshold):
         ids = np.where(labels == l)[0]
         # Checking if current cluster is not an empty cluster (label == -1).
         if l != -1:
-            # Check if cluster has more points than min_points.
-            if ids.shape[0] >= min_points:
-                # Calculated eigenvalues for current cluster.
-                e = svd_evals(arr[ids])
-                # Assigning current eigenvalues to indices of all points of
-                # current cluster in final_evals.
-                final_evals[ids] = e
+            # Calculated eigenvalues for current cluster.
+            e = svd_evals(arr[ids])
+            # Assigning current eigenvalues to indices of all points of
+            # current cluster in final_evals.
+            final_evals[ids] = e
 
     # Mask points by largest eigenvalue (column -0).
     return final_evals[:, 0] >= eval_threshold

@@ -17,13 +17,13 @@ with open('requirements.txt') as f:
 
 setup(
     name="tlseparation",
-    version="1.2.1.5",
+    version="1.2.1.7",
     author='Matheus Boni Vicari',
     author_email='matheus.boni.vicari@gmail.com',
     packages=find_packages(),
     entry_points={
 	},
-    url='https://github.com/mattbv/tlseparation',
+    url='https://github.com/TLSeparation/source',
     license='LICENSE.txt',
     description='Performs the wood/leaf separation from\
  3D point clouds generated using Terrestrial LiDAR\
