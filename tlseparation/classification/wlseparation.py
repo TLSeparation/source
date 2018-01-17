@@ -194,13 +194,13 @@ def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3,
         gd_1 = np.zeros([arr.shape[0], 6], dtype=float)
 
         # Processing blocks of indices to avoid running out of memory.
-        for i in ids:
+        for bid in ids:
             # Subseting indices and distances based on initial knn search and
             # current knn value (k).
-            dx_1, idx_1 = subset_nbrs(d_base[i], idx_base[i], k)
+            dx_1, idx_1 = subset_nbrs(d_base[bid], idx_base[bid], k)
 
             # Calculating the geometric descriptors.
-            gd_1[i, :] = knn_features(arr[i], idx_1)
+            gd_1[bid, :] = knn_features(arr[bid], idx_1)
 
         # Classifying the points based on the geometric descriptors.
         classes_1, cm_1, proba_1 = classify(gd_1, n_classes)
