@@ -62,9 +62,6 @@ def set_nbrs_knn(arr, pts, knn, return_dist=True, block_size=100000):
 
     """
 
-    # Making sure knn has the right data type.
-    knn = int(knn)
-
     # Initiating the nearest neighbors search and fitting it to the input
     # array.
     nbrs = NearestNeighbors(n_neighbors=knn, metric='euclidean',
@@ -220,4 +217,4 @@ def subset_nbrs(distance, indices, new_knn):
             new_indices.append(i)
 
     # Returning new_distance and new_indices as arrays.
-    return np.asarray(new_distance), np.asarray(new_indices, dtype=int)
+    return np.asarray(new_distance), np.asarray(new_indices)
