@@ -211,10 +211,10 @@ def subset_nbrs(distance, indices, new_knn):
         # columns larger than the available columns.
         if distance.shape[1] >= new_knn:
             new_distance.append(d[:new_knn+1])
-            new_indices.append(i[:new_knn+1])
+            new_indices.append(i[:new_knn+1].astype(int))
         else:
             new_distance.append(d)
-            new_indices.append(i)
+            new_indices.append(int(i))
 
     # Returning new_distance and new_indices as arrays.
     return np.asarray(new_distance), np.asarray(new_indices)
