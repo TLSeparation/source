@@ -3,6 +3,9 @@ v1.2.1.7
 - Changed clustering in filtering.cluster_filter from DBSCAN to HDBSCAN in order to improve memory efficiency.
 - Minor adjustments in automated_separation.large_tree_1.
 - Created new knn optimization function to detect knn values automatically.
+- Fixed VisibleDeprecationWarning from knnsearch.py - now the code converts any knn value to int automatically.
+- Added block processing in wlseparate_abs and wlseparate_ref_voting. This should improve memory efficiency for larger knn values and/or larger point clouds.
+- Changed output data type of indices from knnsearch.subset_nbrs to int.
 
 
 v1.2.1.6

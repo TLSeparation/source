@@ -103,7 +103,8 @@ def fill_class(arr1, arr2, noclass, k):
     return arr1, arr2
 
 
-def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3):
+def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3,
+                          block_size=100000):
 
     """
     Classifies a point cloud (arr) into two main classes, wood and leaf.
@@ -140,6 +141,9 @@ def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3):
         Dataframe or path to reference classes file.
     n_classes : int
         Number of classes to use in the Gaussian Mixture Classification.
+    block_size : int
+        Limit of points to process at the same time. The variable 'arr' will
+        be subdivided in n blocks of size block_size to process.
 
     Returns
     -------
@@ -158,6 +162,10 @@ def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3):
     # Making sure 'knn_lst' is of list type.
     if type(knn_lst) != list:
         knn_lst = [knn_lst]
+
+    # Creating block of indices from arr.
+    ids = np.arange(arr.shape[0])
+    ids = np.array_split(ids, int(arr.shape[0] / block_size))
 
     # Initializing voting accumulator and class probability arrays.
     vt = np.full([arr.shape[0], len(knn_lst)], -1, dtype=int)
@@ -181,12 +189,18 @@ def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3):
 
     # Looping over values of knn in knn_lst.
     for i, k in enumerate(knn_lst):
-        # Subseting indices and distances based on initial knn search and
-        # current knn value (k).
-        dx_1, idx_1 = subset_nbrs(d_base, idx_base, k)
 
-        # Calculating the geometric descriptors.
-        gd_1 = knn_features(arr, idx_1)
+        # Initializing variable gd_1.
+        gd_1 = np.zeros([arr.shape[0], 6], dtype=float)
+
+        # Processing blocks of indices to avoid running out of memory.
+        for i in ids:
+            # Subseting indices and distances based on initial knn search and
+            # current knn value (k).
+            dx_1, idx_1 = subset_nbrs(d_base[i], idx_base[i], k)
+
+            # Calculating the geometric descriptors.
+            gd_1[i, :] = knn_features(arr[i], idx_1)
 
         # Classifying the points based on the geometric descriptors.
         classes_1, cm_1, proba_1 = classify(gd_1, n_classes)
@@ -251,7 +265,8 @@ def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3):
     return class_dict, count_dict, prob_dict
 
 
-def wlseparate_abs(arr, knn, knn_downsample=1, n_classes=3):
+def wlseparate_abs(arr, knn, knn_downsample=1, n_classes=3,
+                   block_size=100000):
 
     """
     Classifies a point cloud (arr) into three main classes, wood, leaf and
@@ -283,6 +298,9 @@ def wlseparate_abs(arr, knn, knn_downsample=1, n_classes=3):
         in memory and processing time.
     n_classes : int
         Number of classes to use in the Gaussian Mixture Classification.
+    block_size : int
+        Limit of points to process at the same time. The variable 'arr' will
+        be subdivided in n blocks of size block_size to process.
 
     Returns
     -------
@@ -291,8 +309,11 @@ def wlseparate_abs(arr, knn, knn_downsample=1, n_classes=3):
     class_probability : dict
         Dictionary containing probabilities for wood and leaf classes.
 
-
     """
+
+    # Creating block of indices from arr.
+    ids = np.arange(arr.shape[0])
+    ids = np.array_split(ids, int(arr.shape[0] / block_size))
 
     # Generating the indices array of the 'k' nearest neighbors (knn) for all
     # points in arr.
@@ -309,8 +330,13 @@ def wlseparate_abs(arr, knn, knn_downsample=1, n_classes=3):
                                             replace=False)
         idx_1 = idx_f.astype(int)
 
-    # Calculating geometric descriptors.
-    gd_1 = knn_features(arr, idx_1)
+    # Initializing variable gd_1.
+    gd_1 = np.zeros([arr.shape[0], 6], dtype=float)
+
+    # Processing blocks of indices to avoid running out of memory.
+    for i in ids:
+        # Calculating geometric descriptors.
+        gd_1[i, :] = knn_features(arr[i], idx_1[i])
 
     # Classifying the points based on the geometric descriptors.
     classes_1, cm_1, proba_1 = classify(gd_1, n_classes)
