@@ -3,6 +3,7 @@ v1.2.1.7
 - Changed clustering in filtering.cluster_filter from DBSCAN to HDBSCAN in order to improve memory efficiency.
 - Minor adjustments in automated_separation.large_tree_1.
 - Created new knn optimization function to detect knn values automatically.
+- Added block processing to *subset_nbrs*;
 
 
 v1.2.1.6

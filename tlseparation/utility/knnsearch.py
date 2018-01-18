@@ -62,6 +62,9 @@ def set_nbrs_knn(arr, pts, knn, return_dist=True, block_size=100000):
 
     """
 
+    # Making sure knn is of type int.
+    knn = int(knn)
+
     # Initiating the nearest neighbors search and fitting it to the input
     # array.
     nbrs = NearestNeighbors(n_neighbors=knn, metric='euclidean',
@@ -176,11 +179,13 @@ def set_nbrs_rad(arr, pts, rad, return_dist=True, block_size=100000):
         return indices
 
 
-def subset_nbrs(distance, indices, new_knn):
+def subset_nbrs(distance, indices, new_knn, block_size=100000):
 
     """
     Performs a subseting of points from the results of a nearest neighbors
     search.
+    This function assumes that the first index/distance in each row represents
+    the center point of the neighborhood represented by said rows.
 
     Parameters
     ----------
@@ -190,6 +195,9 @@ def subset_nbrs(distance, indices, new_knn):
         Set of neighbors indices from 'arr' for each entry in 'pts'.
     new_knn : array
         Number of neighbors to select from the initial number of neighbors.
+    block_size : int
+        Limit of points to query. The variables 'distance' and 'indices' will
+        be subdivided in n blocks of size block_size to perform query.
 
     Returns
     -------
@@ -200,21 +208,33 @@ def subset_nbrs(distance, indices, new_knn):
 
     """
 
+    # Making sure block_size is limited by at most the number of points in
+    # arr.
+    if block_size > distance.shape[0]:
+        block_size = distance.shape[0]
+
+    # Creating block of ids.
+    ids = np.arange(distance.shape[0])
+    ids = np.array_split(ids, int(distance.shape[0] / block_size))
+
     # Initializing new_distance and new_indices variables.
     new_distance = []
     new_indices = []
 
-    # Looping over each sample in distance and indices.
-    for d, i in zip(distance, indices):
-        # Checks if new knn values are smaller than current distance and
-        # indices rows. This avoids errors of trying to select a number of
-        # columns larger than the available columns.
-        if distance.shape[1] >= new_knn:
-            new_distance.append(d[:new_knn+1])
-            new_indices.append(i[:new_knn+1].astype(int))
-        else:
-            new_distance.append(d)
-            new_indices.append(int(i))
+    # Processing all blocks of indices in ids.
+    for id_ in ids:
+
+        # Looping over each sample in distance and indices.
+        for d, i in zip(distance[id_], indices[id_]):
+            # Checks if new knn values are smaller than current distance and
+            # indices rows. This avoids errors of trying to select a number of
+            # columns larger than the available columns.
+            if distance.shape[1] >= new_knn:
+                new_distance.append(d[:new_knn+1])
+                new_indices.append(i[:new_knn+1].astype(int))
+            else:
+                new_distance.append(d)
+                new_indices.append(int(i))
 
     # Returning new_distance and new_indices as arrays.
     return np.asarray(new_distance), np.asarray(new_indices)
