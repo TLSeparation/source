@@ -33,7 +33,7 @@ from pandas import DataFrame
 class DefaultClass:
 
     """
-    Defines a defaul reference class to be used in classification of
+    Defines a default reference class to be used in classification of
     tree point clouds.
 
     """

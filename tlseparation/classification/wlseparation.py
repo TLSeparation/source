@@ -29,7 +29,7 @@ __status__ = "Development"
 import numpy as np
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors
-from ..utility.knnsearch import set_nbrs_knn, subset_nbrs
+from ..utility.knnsearch import (set_nbrs_knn, subset_nbrs)
 from ..classification.point_features import knn_features
 from ..classification.gmm import (classify, class_select_abs,
                                   class_select_ref)
