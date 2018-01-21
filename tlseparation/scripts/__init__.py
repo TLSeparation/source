@@ -26,4 +26,4 @@ __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
 
-from .automated_separation import large_tree_1
+from .automated_separation import large_tree_1, large_tree_2

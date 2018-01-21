@@ -155,16 +155,17 @@ def continuity_filter(wood, leaf, rad=0.05):
     # Stacking wood and leaf arrays.
     arr = np.vstack((wood, leaf))
 
-    # Obtaining wood point cloud indices.
-    wood_id = np.arange(wood.shape[0])
-
     # Calculating shortest path graph over sampled array.
     G = array_to_graph(arr, 0, 3, 100, 0.05, 0.02, 0.5)
-    _, dist = extract_path_info(G, 0, return_path=False)
+    node_ids, dist = extract_path_info(G, 0, return_path=False)
+    node_ids = np.array(node_ids)
+
+    # Obtaining wood point cloud indices.
+    wood_id = node_ids[node_ids <= wood.shape[0]]
 
     # Generating nearest neighbors search for the entire point cloud (arr).
     nbrs = NearestNeighbors(algorithm='kd_tree', leaf_size=10,
-                            n_jobs=-1).fit(arr)
+                            n_jobs=-1).fit(arr[node_ids])
 
     # Converting dist variable to array, as it is originaly a list.
     dist = np.asarray(dist)

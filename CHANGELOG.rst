@@ -4,7 +4,8 @@ v1.2.1.7
 - Minor adjustments in automated_separation.large_tree_1.
 - Created new knn optimization function to detect knn values automatically.
 - Added block processing to *subset_nbrs*;
-
+- Minor fixes for improvement on continuity_filter stability. 
+- Added new automated separation script, automated_separation.large_tree_2.
 
 v1.2.1.6
 --------
