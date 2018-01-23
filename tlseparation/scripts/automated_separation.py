@@ -322,7 +322,7 @@ filter in an attempt to close gaps in the wood point cloud')
     return wood_final, leaf_final
 
 
-def large_tree_2(arr, class_file=[], cont_filt=True,
+def large_tree_2(arr, class_file=[], knn_lst=[20, 40, 60, 80], cont_filt=True,
                  class_prob_threshold=0.95, verbose=False):
 
     """
@@ -337,6 +337,16 @@ def large_tree_2(arr, class_file=[], cont_filt=True,
     class_file : str
         Path to classes reference values file. This file will be loaded and
         its reference values are used to select wood and leaf classes.
+    knn_lst: list
+        Set of knn values to use in the neighborhood search in classification
+        steps. This variable will be directly used in a step containing
+        the function wlseparate_ref_voting  and its minimum value will be used
+        in another step containing wlseparate_abs (both from
+        classification.wlseparate). These values are directly dependent of
+        point density and were defined based on a medium point density
+        scenario (mean distance between points aroun 0.05m). Therefore, for
+        higher density point clouds it's recommended the use of larger knn
+        values for optimal results.
     cont_filt : boolean
         Option to select if continuity_filter should be applied to wood and
         leaf point clouds. Default is True.
@@ -369,12 +379,11 @@ def large_tree_2(arr, class_file=[], cont_filt=True,
         print(str(datetime.datetime.now()) + ' | calculating recommended \
 distance between neighboring points')
     nndist = detect_nn_dist(arr, 10, 0.5)
-
-    knn_lst = [40, 80, 120, 150]
-    knn = np.min(knn_lst)
-
     if verbose:
         print(str(datetime.datetime.now()) + ' | nndist: %s' % nndist)
+
+    # Setting up knn value based on the minimum value from knn_lst.
+    knn = np.min(knn_lst)
 
     ###########################################################################
     # Obtaining mask of points from a slice of points located at the base of
@@ -452,12 +461,13 @@ part of a leaf point cloud (not_wood_1)')
             # Setting up a boolean mask of wood_1 and not_wood_1 points.
             wood_1_bool = np.zeros(arr.shape[0], dtype=bool)
             wood_1_bool[wood_1] = True
-            wood_1_1_mask, _ = class_filter(arr[wood_1_bool],
-                                            arr[~wood_1_bool], 0, knn=10)
+
             # Obtaining wood_1 filtered point indices.
             if verbose:
                 print(str(datetime.datetime.now()) + ' | obtaining wood_1 \
 filtered point indices')
+            wood_1_1_mask, _ = class_filter(arr[wood_1_bool],
+                                            arr[~wood_1_bool], 0, knn=10)
             wood_1_1_mask = np.where(wood_1_1_mask)[0]
             wood_1_1 = wood_1[wood_1_1_mask]
         except:
@@ -502,24 +512,37 @@ voting separation')
         twig_2 = twig_2_mask[twig_2_count >= 2][twig_2_prob_mask]
 
         try:
+            # Applying class_filter on filtered twig point cloud.
+            if verbose:
+                print(str(datetime.datetime.now()) + ' | applying \
+class_filter on filtered twig point cloud')
+            # Setting up a boolean mask of twig_2 and not_twig_2 points.
+            twig_2_bool = np.zeros(arr.shape[0], dtype=bool)
+            twig_2_bool[twig_2] = True
+            twig_2_1_mask, _ = class_filter(arr[twig_2_bool],
+                                            arr[~twig_2_bool], 0, knn=10)
+            twig_2_1_mask = np.where(twig_2_1_mask)[0]
+            twig_2_1 = twig_2[twig_2_1_mask]
+
             # Applying radius_filter on filtered twig point cloud.
             if verbose:
                 print(str(datetime.datetime.now()) + ' | applying \
 radius_filter on filtered twig point cloud')
-            twig_2_1_mask = radius_filter(arr[twig_2], 0.1, 5)
-            twig_2_1 = twig_2[twig_2_1_mask]
+            twig_2_2_mask = radius_filter(arr[twig_2_1], 0.05, 5)
+            twig_2_2 = twig_2_1[twig_2_2_mask]
+
         except:
-            twig_2_1 = twig_2
+            twig_2_2 = twig_2
 
     except:
-        # In case voting separation fails, set twig_2_1 as an empty list.
-        twig_2_1 = []
+        # In case voting separation fails, set twig_2_2 as an empty list.
+        twig_2_2 = []
         if verbose:
             print(str(datetime.datetime.now()) + ' | reference class \
 separation failed, setting twig_2_1 as an empty list')
     ###########################################################################
     # Stacking all clouds part of the wood portion.
-    wood_ids = np.hstack((base_ids, trunk_ids, twig_2_1, wood_1_1))
+    wood_ids = np.hstack((base_ids, trunk_ids, twig_2_2, wood_1_1))
     wood_ids = np.unique(wood_ids).astype(int)
 
     # Filtering out tips of each branch, which should remove leaf points

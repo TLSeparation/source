@@ -166,8 +166,7 @@ def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3):
     # Generating a base set of indices and distances around each point.
     # This step uses the largest value in knn_lst to make further searches,
     # with smaller values of knn, more efficient.
-    d_base, idx_base = set_nbrs_knn(arr, arr, np.max(knn_lst),
-                                    return_dist=True)
+    idx_base = set_nbrs_knn(arr, arr, np.max(knn_lst), return_dist=False)
 
     # Reading in class reference values from file.
     if isinstance(class_file, str):
@@ -183,7 +182,7 @@ def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3):
     for i, k in enumerate(knn_lst):
         # Subseting indices and distances based on initial knn search and
         # current knn value (k).
-        dx_1, idx_1 = subset_nbrs(d_base, idx_base, k)
+        idx_1 = idx_base[:, :k+1]
 
         # Calculating the geometric descriptors.
         gd_1 = knn_features(arr, idx_1)
