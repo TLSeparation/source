@@ -539,7 +539,7 @@ radius_filter on filtered twig point cloud')
         twig_2_2 = []
         if verbose:
             print(str(datetime.datetime.now()) + ' | reference class \
-separation failed, setting twig_2_1 as an empty list')
+separation failed, setting twig_2_2 as an empty list')
     ###########################################################################
     # Stacking all clouds part of the wood portion.
     wood_ids = np.hstack((base_ids, trunk_ids, twig_2_2, wood_1_1))
@@ -549,8 +549,9 @@ separation failed, setting twig_2_1 as an empty list')
     # misclassified as wood.
     path_filter_mask = detect_main_pathways(arr[wood_ids], 8, 100, .06,
                                             verbose=verbose)
+    final_wood = wood_ids[path_filter_mask]
 
-    wood = arr[path_filter_mask]
+    wood = arr[final_wood]
     # Removing duplicate points from wood point cloud. As there is a lot of
     # overlap in the classification phase, this step is rather necessary.
     if verbose:
