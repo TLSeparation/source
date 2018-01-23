@@ -377,8 +377,8 @@ def class_filter(arr_1, arr_2, target, **kwargs):
 
     # Generating the class arrays from both classified arrays and combining
     # them into a single classes array (classes).
-    class_1 = np.full(arr_1.shape[0], 1, dtype=np.int)
-    class_2 = np.full(arr_2.shape[0], 2, dtype=np.int)
+    class_1 = np.full(arr_1.shape[0], 0, dtype=np.int)
+    class_2 = np.full(arr_2.shape[0], 1, dtype=np.int)
     classes = np.hstack((class_1, class_2)).T
 
     # Generating the indices for the local subsets of points around all points
@@ -410,7 +410,7 @@ def class_filter(arr_1, arr_2, target, **kwargs):
         # Appending the majority class into the output variable.
         c_maj[i] = count.argmax()
 
-    return c_maj == 1, c_maj == 2
+    return c_maj == 0, c_maj == 1
 
 
 def dist_majority(arr_1, arr_2, **kwargs):

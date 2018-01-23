@@ -163,8 +163,11 @@ that were classified with a probability lower than class_prob_threshold')
                 print(str(datetime.datetime.now()) + ' | \
 applying class_filter to remove wood_1 points that are more likely to be \
 part of a leaf point cloud (not_wood_1)')
-            wood_1_1_mask, _ = class_filter(arr[wood_1], arr[~wood_1], 1,
-                                            knn=20)
+            # Setting up a boolean mask of wood_1 and not_wood_1 points.
+            wood_1_bool = np.zeros(arr.shape[0], dtype=bool)
+            wood_1_bool[wood_1] = True
+            wood_1_1_mask, _ = class_filter(arr[wood_1_bool],
+                                            arr[~wood_1_bool], 0, knn=10)
             # Obtaining wood_1 filtered point indices.
             if verbose:
                 print(str(datetime.datetime.now()) + ' | obtaining wood_1 \
@@ -367,7 +370,7 @@ def large_tree_2(arr, class_file=[], cont_filt=True,
 distance between neighboring points')
     nndist = detect_nn_dist(arr, 10, 0.5)
 
-    knn_lst = [80, 70, 100, 150]
+    knn_lst = [40, 80, 120, 150]
     knn = np.min(knn_lst)
 
     if verbose:
@@ -446,8 +449,11 @@ that were classified with a probability lower than class_prob_threshold')
                 print(str(datetime.datetime.now()) + ' | \
 applying class_filter to remove wood_1 points that are more likely to be \
 part of a leaf point cloud (not_wood_1)')
-            wood_1_1_mask, _ = class_filter(arr[wood_1], arr[~wood_1], 1,
-                                            knn=20)
+            # Setting up a boolean mask of wood_1 and not_wood_1 points.
+            wood_1_bool = np.zeros(arr.shape[0], dtype=bool)
+            wood_1_bool[wood_1] = True
+            wood_1_1_mask, _ = class_filter(arr[wood_1_bool],
+                                            arr[~wood_1_bool], 0, knn=10)
             # Obtaining wood_1 filtered point indices.
             if verbose:
                 print(str(datetime.datetime.now()) + ' | obtaining wood_1 \
@@ -515,7 +521,13 @@ separation failed, setting twig_2_1 as an empty list')
     # Stacking all clouds part of the wood portion.
     wood_ids = np.hstack((base_ids, trunk_ids, twig_2_1, wood_1_1))
     wood_ids = np.unique(wood_ids).astype(int)
-    wood = arr[wood_ids]
+
+    # Filtering out tips of each branch, which should remove leaf points
+    # misclassified as wood.
+    path_filter_mask = detect_main_pathways(arr[wood_ids], 8, 100, .06,
+                                            verbose=verbose)
+
+    wood = arr[path_filter_mask]
     # Removing duplicate points from wood point cloud. As there is a lot of
     # overlap in the classification phase, this step is rather necessary.
     if verbose:

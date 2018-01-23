@@ -7,4 +7,4 @@ Python package
 ~~~~~~~~~~~~~~
 - Improve *continuity_filter*;
 - Add logging options;
-- Add block processing to *subset_nbrs*;
+- Fix class_filter input target values (make it uniform across the function - used to be 1 or 2, now should be 0 or 1);
