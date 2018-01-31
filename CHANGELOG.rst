@@ -1,9 +1,13 @@
+v1.2.1.8
+--------
+- Fixed base point index in *continuity_filter*;
+
 v1.2.1.7
 --------
 - Changed clustering in filtering.cluster_filter from DBSCAN to HDBSCAN in order to improve memory efficiency.
 - Minor adjustments in automated_separation.large_tree_1.
 - Created new knn optimization function to detect knn values automatically.
-- Added block processing to *subset_nbrs*.
+- Added block processing to *subset_nbrs*.e
 - Minor fixes for improvement on continuity_filter stability. 
 - Added new automated separation script, automated_separation.large_tree_2.
 - Corrected class_filter application on large_tree_1 and large_tree_2.
@@ -18,8 +22,7 @@ v1.2.1.5
 --------
 - Added verbose option to some modules.
 - Changed docstrings style to numpydoc.
-- Added default class_ref DataFrame as a built-in object. User now has the option to use this new default or continue to load a
-	.csv file.
+- Added default class_ref DataFrame as a built-in object. User now has the option to use this new default or continue to load a .csv file.
 - Added voxels.py module to create voxels from point clouds.
 - Added voxelization step in automated_separation.large_tree_1 to improve performance in path_detection.
 
