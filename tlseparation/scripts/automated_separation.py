@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari", "Phil Wilkes"]
 __license__ = "GPL3"
-__version__ = "1.2.2.1"
+__version__ = "1.2.2.2"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -83,6 +83,11 @@ def large_tree_1(arr, class_file=[], cont_filt=True,
         print(str(datetime.datetime.now()) + ' | calculating recommended \
 distance between neighboring points')
     nndist = detect_nn_dist(arr, 10, 0.5)
+    # Checking if no input was given to cf_rad and if so, calculate it from
+    # nndist.
+    if len(cf_rad) == 0:
+        cf_rad = nndist * 0.66
+
     knn_lst = detect_optimal_knn(arr)
     knn = np.min(knn_lst)
     knn_lst = [80, 70, 100, 150]
@@ -651,6 +656,11 @@ def large_tree_3(arr, class_file=[], knn_lst=[20, 40, 60, 80], cont_filt=True,
         print(str(datetime.datetime.now()) + ' | calculating recommended \
 distance between neighboring points')
     nndist = detect_nn_dist(arr, 10, 0.5)
+    # Checking if no input was given to cf_rad and if so, calculate it from
+    # nndist.
+    if len(cf_rad) == 0:
+        cf_rad = nndist * 0.66
+
     if verbose:
         print(str(datetime.datetime.now()) + ' | nndist: %s' % nndist)
 
@@ -835,7 +845,7 @@ filter in an attempt to close gaps in the wood point cloud')
         try:
             wood_filt_2, leaf_filt_2 = continuity_filter(wood_filt_1,
                                                          leaf_filt_1,
-                                                         rad=nndist)
+                                                         rad=cf_rad)
 
             # Applying path filter agin to clean up data after continuity filter.
             if verbose:

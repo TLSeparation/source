@@ -1,3 +1,7 @@
+v1.2.2.2
+--------
+- Bug fixes in *automated_separation.large_tree_3*.
+
 v1.2.2.1
 --------
 - Fixed base point index in *continuity_filter*.
