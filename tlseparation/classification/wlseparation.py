@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.7"
+__version__ = "1.2.2.1"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -29,7 +29,7 @@ __status__ = "Development"
 import numpy as np
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors
-from ..utility.knnsearch import (set_nbrs_knn, subset_nbrs)
+from ..utility.knnsearch import set_nbrs_knn
 from ..classification.point_features import knn_features
 from ..classification.gmm import (classify, class_select_abs,
                                   class_select_ref)

@@ -20,13 +20,14 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.1.7"
+__version__ = "1.2.2.1"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
 from .point_features import knn_features
 from .gmm import (classify, class_select_abs, class_select_ref)
-from .path_detection import (detect_main_pathways, get_base)
+from .path_detection import (detect_main_pathways, voxel_path_detection,
+                             get_base)
 from .wlseparation import (wlseparate_abs, wlseparate_ref_voting, fill_class)
 from .classes_reference import DefaultClass

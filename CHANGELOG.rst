@@ -1,6 +1,8 @@
-v1.2.1.8
+v1.2.2.1
 --------
-- Fixed base point index in *continuity_filter*;
+- Fixed base point index in *continuity_filter*.
+- Added new voxelization wrapped around *detect_main_pathways* that aims to speed up the processing.
+- Added new *automated_separation* script, *large_tree_3*.
 
 v1.2.1.7
 --------

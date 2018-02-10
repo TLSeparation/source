@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari", "Phil Wilkes"]
 __license__ = "GPL3"
-__version__ = "1.2.1.7"
+__version__ = "1.2.2.1"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -30,6 +30,78 @@ import datetime
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 from ..utility.shortpath import (array_to_graph, extract_path_info)
+from ..utility.voxels import voxelize_cloud
+
+
+def voxel_path_detection(point_cloud, voxel_size, k_retrace, knn,
+                         nbrs_threshold, verbose=False):
+
+    """
+    Applies detect_main_pathways but with a voxelization option to speed up
+    processing.
+
+    Parameters
+    ----------
+    point_cloud : array
+        Three-dimensional point cloud of a single tree to perform the
+        wood-leaf separation. This should be a n-dimensional array (m x n)
+        containing a set of coordinates (n) over a set of points (m).
+    voxel_size: float
+        Voxel dimensions' size.
+    k_retrace : int
+        Number of steps in the graph to retrace back to graph's base. Every
+        node in graph will be moved  k_retrace steps from the extremities
+        towards to base.
+    knn : int
+        Number of neighbors to fill gaps in detected paths. The larger the
+        better. A large knn will increase memory usage. Recommended value
+        between 50 and 150.
+    nbrs_threshold : float
+        Maximum distance to valid neighboring points used to fill gaps in
+        detected paths.
+    verbose: bool
+        Option to set verbose on/off.
+
+    Returns
+    -------
+    path_mask : array
+        Boolean mask where 'True' represents points detected as part of the
+        main pathways and 'False' represents points not part of the pathways.
+
+    Raises
+    ------
+    AssertionError:
+        point_cloud has the wrong shape or number of dimensions.
+    """
+
+    # Making sure input point cloud has the right shape and number of
+    # dimensions.
+    assert point_cloud.ndim == 2, "point_cloud must be an array with 2\
+ dimensions, n_points x 3 (x, y, z)."
+    assert point_cloud.shape[1] == 3, "point_cloud must be a 3D point cloud.\
+ Make sure it has the shape n_points x 3 (x, y, z)."
+
+    # Voxelizing point cloud.
+    if verbose:
+        print(str(datetime.datetime.now()) + ' | >>> voxelizing point cloud, \
+with a voxel size of %s' % voxel_size)
+    vox = voxelize_cloud(point_cloud, voxel_size=voxel_size)
+    vox_coords = np.asarray(vox.keys())
+
+    # Running detect_main_pathways over voxels' coordinates.
+    if verbose:
+        print(str(datetime.datetime.now()) + ' | >>> running \
+detect_main_pathways with %s number of steps retraced' % k_retrace)
+    path_mask_voxel = detect_main_pathways(vox_coords, k_retrace, knn,
+                                           nbrs_threshold, verbose=verbose)
+    # Re-indexing point_cloud indices from voxels coordinates detected as
+    # part of the path.
+    path_ids = np.unique([j for i in vox_coords[path_mask_voxel] for
+                          j in vox[tuple(i)]])
+    path_mask = np.zeros(point_cloud.shape[0], dtype=bool)
+    path_mask[path_ids] = True
+
+    return path_mask
 
 
 def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold,
