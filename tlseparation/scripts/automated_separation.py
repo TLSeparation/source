@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari", "Phil Wilkes"]
 __license__ = "GPL3"
-__version__ = "1.2.2.2"
+__version__ = "1.2.2.3"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -83,10 +83,6 @@ def large_tree_1(arr, class_file=[], cont_filt=True,
         print(str(datetime.datetime.now()) + ' | calculating recommended \
 distance between neighboring points')
     nndist = detect_nn_dist(arr, 10, 0.5)
-    # Checking if no input was given to cf_rad and if so, calculate it from
-    # nndist.
-    if len(cf_rad) == 0:
-        cf_rad = nndist * 0.66
 
     knn_lst = detect_optimal_knn(arr)
     knn = np.min(knn_lst)
@@ -686,7 +682,7 @@ from a slice of points located at the base of the tree')
         print(str(datetime.datetime.now()) + ' | masking points most likely \
 to be part of the trunk and larger branches')
     try:
-        trunk_mask = voxel_path_detection(arr, 0.05, 40, 100, 0.1, True)
+        trunk_mask = voxel_path_detection(arr, 0.1, 40, 100, 0.15, True)
         # Obtaining indices of points that are part of the trunk (trunk_ids)
         # and not part of the trunk (not_trunk_ids).
         # trunk.
@@ -824,7 +820,7 @@ separation failed, setting twig_2_2 as an empty list')
          print(str(datetime.datetime.now()) + ' | running path filtering \
 on wood points')
     try:
-        path_filter_mask = voxel_path_detection(wood, 0.05, 8, 100, 0.1,
+        path_filter_mask = voxel_path_detection(wood, 0.1, 8, 100, 0.15,
                                                 verbose=True)
         wood_filt_1 = wood[path_filter_mask]
         leaf_filt_1 = get_diff(arr, wood_filt_1)
@@ -852,8 +848,8 @@ filter in an attempt to close gaps in the wood point cloud')
                  print(str(datetime.datetime.now()) + ' | running path \
 filtering on wood points')
             try:
-                path_filter_mask_2 = voxel_path_detection(wood_filt_2, 0.05,
-                                                          4, 100, 0.1,
+                path_filter_mask_2 = voxel_path_detection(wood_filt_2, 0.1,
+                                                          4, 100, 0.15,
                                                           verbose=True)
                 wood_filt_2 = wood_filt_2[path_filter_mask_2]
             except:

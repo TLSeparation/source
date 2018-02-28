@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari", "Phil Wilkes"]
 __license__ = "GPL3"
-__version__ = "1.2.2.2"
+__version__ = "1.2.2.3"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -105,7 +105,7 @@ detect_main_pathways with %s number of steps retraced' % k_retrace)
 
 
 def detect_main_pathways(point_cloud, k_retrace, knn, nbrs_threshold,
-                         verbose=False):
+                         verbose=False, max_iter=100):
 
     """
     Detects the main pathways of an unordered 3D point cloud. Set as true
@@ -206,7 +206,8 @@ arround each point in arr')
     if verbose:
         print(str(datetime.datetime.now()) + ' | >>> looping while there \
 are still indices in current_idx to process')
-    while len(current_idx) > 0:
+    iteration = 0
+    while (len(current_idx) > 0) & (iteration <= max_iter):
 
         # Selecting NearestNeighbors indices and distances for current
         # indices being processed.
@@ -249,6 +250,9 @@ are still indices in current_idx to process')
 
         # Generating list of remaining proints to process.
         idx = idx_base[np.in1d(idx_base, processed_idx, invert=True)]
+
+        # Increasing one iteration step.
+        iteration += 1
 
     # Just in case of not having detected all points in the desired paths, run
     # another last iteration.

@@ -1,3 +1,8 @@
+v1.2.2.3
+--------
+- Changed *voxel_path_detect* parameters to speed up processing.
+- Added maximum iterations to *detect_main_pathways* to avoid infinite loops or long processing times.
+
 v1.2.2.2
 --------
 - Bug fixes in *automated_separation.large_tree_3*.
