@@ -17,7 +17,7 @@
 
 
 __author__ = "Matheus Boni Vicari"
-__copyright__ = "Copyright 2017, TLSeparation Project"
+__copyright__ = "Copyright 2017-2018, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
 __version__ = "1.2.2.3"

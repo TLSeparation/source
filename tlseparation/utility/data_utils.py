@@ -17,10 +17,10 @@
 
 
 __author__ = "Matheus Boni Vicari"
-__copyright__ = "Copyright 2017, TLSeparation Project"
+__copyright__ = "Copyright 2017-2018, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.2.3"
+__version__ = "1.2.2.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -77,6 +77,9 @@ def remove_duplicates(arr, return_ids=False):
     arr : array
         N-dimensional array (m x n) containing a set of parameters (n) over
         a set of observations (m).
+    return_ids: bool
+        Option to return indices of duplicated entries instead of new array
+        with unique entries.
 
     Returns
     -------
@@ -90,11 +93,16 @@ def remove_duplicates(arr, return_ids=False):
     df = pd.DataFrame({'x': arr[:, 0],
                        'y': arr[:, 1], 'z': arr[:, 2]})
 
-    # Using the drop_duplicates function to remove the duplicate points from
-    # df.
-    unique = df.drop_duplicates(['x', 'y', 'z'])
+    if return_ids:
+        # Using the duplicated function to mask duplicate points from df.
+        return np.where(df.duplicated((['x', 'y', 'z'])))[0]
 
-    return np.asarray(unique).astype(float)
+    else:
+        # Using the drop_duplicates function to remove duplicate points
+        # from df.
+        unique = df.drop_duplicates(['x', 'y', 'z'])
+
+        return np.asarray(unique).astype(float)
 
 
 def apply_nn_value(base, arr, attr):

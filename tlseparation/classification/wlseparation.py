@@ -17,10 +17,10 @@
 
 
 __author__ = "Matheus Boni Vicari"
-__copyright__ = "Copyright 2017, TLSeparation Project"
+__copyright__ = "Copyright 2017-2018, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.2.3"
+__version__ = "1.2.2.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -290,7 +290,6 @@ def wlseparate_abs(arr, knn, knn_downsample=1, n_classes=3):
     class_probability : dict
         Dictionary containing probabilities for wood and leaf classes.
 
-
     """
 
     # Generating the indices array of the 'k' nearest neighbors (knn) for all
@@ -322,16 +321,22 @@ def wlseparate_abs(arr, knn, knn_downsample=1, n_classes=3):
     # output.
     arr_ids = np.arange(0, arr.shape[0], 1, dtype=int)
 
-    # Creating output class indices dictionary.
+    # Creating output class indices dictionary and class probabilities
+    # dictionary.
     # mask represent wood points, (~) not mask represent leaf points.
     class_indices = {}
-    class_indices['wood'] = arr_ids[mask_1]
-    class_indices['leaf'] = arr_ids[~mask_1]
-
-    # Creating output class probabilities dictionary.
-    # mask represent wood points, (~) not mask represent leaf points.
     class_probability = {}
-    class_probability['wood'] = np.max(proba_1, axis=1)[mask_1]
-    class_probability['leaf'] = np.max(proba_1, axis=1)[~mask_1]
+    try:
+        class_indices['wood'] = arr_ids[mask_1]
+        class_probability['wood'] = np.max(proba_1, axis=1)[mask_1]
+    except:
+        class_indices['wood'] = []
+        class_probability['wood'] = []
+    try:
+        class_indices['leaf'] = arr_ids[~mask_1]
+        class_probability['leaf'] = np.max(proba_1, axis=1)[~mask_1]
+    except:
+        class_indices['leaf'] = []
+        class_probability['leaf'] = []
 
     return class_indices, class_probability

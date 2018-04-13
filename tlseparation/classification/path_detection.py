@@ -17,10 +17,10 @@
 
 
 __author__ = "Matheus Boni Vicari"
-__copyright__ = "Copyright 2017, TLSeparation Project"
+__copyright__ = "Copyright 2017-2018, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari", "Phil Wilkes"]
 __license__ = "GPL3"
-__version__ = "1.2.2.3"
+__version__ = "1.2.2.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -31,6 +31,85 @@ import numpy as np
 from sklearn.neighbors import NearestNeighbors
 from ..utility.shortpath import (array_to_graph, extract_path_info)
 from ..utility.voxels import voxelize_cloud
+from ..utility.downsampling import (downsample_cloud, upsample_cloud)
+from ..utility.filtering import radius_filter
+from ..utility.knnsearch import set_nbrs_rad
+
+
+def path_detect_frequency(point_cloud, downsample_size,
+                          frequency_threshold):
+
+    """
+    Detects points from major paths in a graph generated from a point cloud.
+    The detection is performed by comparing the frequency of all paths that
+    each node is present. Nodes with frequency larger than threshold are
+    selected as detected. In order to fill pathways regions with low nodes
+    density, neighboring points within downsampling_size * 1.5 distance are
+    also set as detected.
+
+    Parameters
+    ----------
+    point_cloud : numpy.ndarray
+        2D (n x 3) array containing n points in 3D space (x, y, z).
+    downsample_size : float
+        Distance threshold used to group (downsample) the input point cloud.
+        Simplificaton of the cloud by downsampling, improves the results and
+        processing times.
+    frequency_threshold : float
+        Minimum path frequency for a node to be selected as part of major
+        pathways.
+
+    Returns
+    -------
+    path_points: numpy.ndarray
+        2D (np x 3) array containing n points in 3D space (x, y, z) that
+        belongs to major pathways in the point cloud.
+
+    """
+
+    # Downsampling point cloud. The function returns downsampled indices
+    # (down_ids) and a set of original neighboring indices around each
+    # downsampled points (up_ids) that can be later used to revert the
+    # downsampling.
+    down_ids, up_ids = downsample_cloud(point_cloud, downsample_size,
+                                        return_indices=True,
+                                        return_neighbors=True)
+    # Obtaining downsampled cloud base index (lowest point in the cloud).
+    base_id = np.argmin(point_cloud[down_ids, 2])
+    # Generating networkx graph from point cloud.
+    G = array_to_graph(point_cloud[down_ids], base_id, 3, 100,
+                       downsample_size * 1.77, 0.02)
+    # Extracting shortest path information from graph: nodes indices
+    # (nodes_ids), shortest path distance (D) and list of nodes in each
+    # nodes' paths (path_dict).
+    nodes_ids, D, path_dict = extract_path_info(G, base_id,
+                                                return_path=True)
+    # Selecting nodes coordinates
+    nodes = point_cloud[down_ids][nodes_ids]
+    # Unpacking all indices in path_dict and appending them to path_ids_list.
+    path_ids_list = []
+    for k, v in path_dict.iteritems():
+        path_ids_list.append(v)
+    # Flattening path_ids_list.
+    path_ids_list = [j for i in path_ids_list for j in i]
+
+    # Calculating counts of paths (c) that go through each unique node (u).
+    u, c = np.unique(path_ids_list, return_counts=True)
+    # Masking nodes with log(c) larger than treshold.
+    mask = np.log(c) >= frequency_threshold
+    # Filtering isolated nodes.
+    mask_radius = radius_filter(nodes[mask], 0.2, 3)
+    # Selecting neighboring nodes.
+    nbrs_idx = set_nbrs_rad(point_cloud, nodes[mask][mask_radius],
+                            downsample_size * 1.5, False)
+
+    # Flattening list of neighboring nodes and upscaling results to
+    # original point cloud.
+    ids = [j for i in nbrs_idx for j in i]
+    ids = np.unique(ids)
+    ups_ids = upsample_cloud(ids, up_ids)
+
+    return point_cloud[ups_ids]
 
 
 def voxel_path_detection(point_cloud, voxel_size, k_retrace, knn,

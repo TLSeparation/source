@@ -7,4 +7,4 @@ Python package
 ~~~~~~~~~~~~~~
 - Improve *continuity_filter*;
 - Add logging options;
-- Fix base point index in *continuity_filter*;
+- Remove HDBSCAN module from package, use DBSCAN instead;

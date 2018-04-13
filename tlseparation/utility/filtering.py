@@ -17,10 +17,10 @@
 
 
 __author__ = "Matheus Boni Vicari"
-__copyright__ = "Copyright 2017, TLSeparation Project"
+__copyright__ = "Copyright 2017-2018, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.2.3"
+__version__ = "1.2.2.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -30,11 +30,81 @@ from knnsearch import (set_nbrs_knn, set_nbrs_rad)
 from data_utils import (get_diff, remove_duplicates)
 from shortpath import (array_to_graph, extract_path_info)
 from sklearn.neighbors import NearestNeighbors
-from hdbscan import HDBSCAN
-from ..classification.point_features import svd_evals
+from sklearn.cluster import DBSCAN
+from ..classification.point_features import (svd_evals, knn_features,
+                                             curvature)
 
 
-def cluster_filter(arr, min_points, eval_threshold):
+def feature_filter(arr, feature_id, threshold, knn):
+
+    """
+    Filters a point cloud based on a given feature threshold. Only points
+    with selected feature values higher than threshold are kept as valid.
+
+    Parameters
+    ----------
+    arr : array
+        Three-dimensional (m x n) array of a point cloud, where the
+        coordinates are represented in the columns (n) and the points are
+        represented in the rows (m).
+    feature_id : int
+        Column index of feature selected as criteria to filter. Column
+        indices follow Python notation [0 - (n_columns - 1)].
+    threshold : float
+        Minimum feature value for valid points.
+    knn : int
+        Number of neighbors to select around each point. Used to describe
+        local point arrangement.
+
+    Returns
+    -------
+    mask_feature : numpy.ndarray
+        Boolean mask with valid points entries set as True.
+
+    """
+
+    # Running NearestNeighborhood search and calculating geometric features
+    # for each point's neighborhood.
+    nbrs_idx = set_nbrs_knn(arr, arr, knn, False)
+    features = knn_features(arr, nbrs_idx)
+    # Masking valid points.
+    return features[:, feature_id] >= threshold
+
+
+def plane_filter(arr, rad, threshold):
+
+    """
+    Filters a point cloud based on its points planicity. Removes points that
+    are part of a neighbohood with planar spatial arrangement (low curvature).
+
+    Parameters
+    ----------
+    arr : array
+        Three-dimensional (m x n) array of a point cloud, where the
+        coordinates are represented in the columns (n) and the points are
+        represented in the rows (m).
+    rad : float
+        Search radius distance around each point. Used to describe
+        local point arrangement.
+    threshold : float
+        Minimum curvature value for valid points.
+
+    Returns
+    -------
+    mask_plane : numpy.ndarray
+        Boolean mask with valid points entries set as True.
+
+    """
+
+    # Running NearestNeighborhood search around each point in arr.
+    nbrs_idx = set_nbrs_rad(arr, arr, rad, False)
+    # Calculating curvature for each point's neighborhood.
+    c = curvature(arr, nbrs_idx)
+
+    return c >= threshold
+
+
+def cluster_filter(arr, max_dist, eval_threshold):
 
     """
     Applies a cluster filter to a point cloud 'arr'. This filter aims to
@@ -44,9 +114,9 @@ def cluster_filter(arr, min_points, eval_threshold):
     ----------
     arr : array
         Point cloud of shape n points x m dimensions to be filtered.
-    min_points : int
-        Minimum number of points in a cluster. Points that are part of
-        clusters with less than min_points are filtered out.
+    max_dist : float
+        Maximum distance between points to considered part of the same
+        cluster.
     eval_threshold : float
         Minimum value for largest eigenvalue for a valid cluster. This value
         is an indication of cluster shape, in which the higher the eigenvalue,
@@ -62,26 +132,31 @@ def cluster_filter(arr, min_points, eval_threshold):
     """
 
     # Initializing and fitting HDBSCAN clustering to input array 'arr'.
-    clusterer = HDBSCAN(min_points).fit(arr)
+    clusterer = DBSCAN(max_dist).fit(arr)
     labels = clusterer.labels_
 
     # Initializing arrat of final eigenvalues for each cluster.
     final_evals = np.zeros([labels.shape[0], 3])
     # Looping over each unique cluster label.
-    for l in np.unique(labels):
+    for L in np.unique(labels):
         # Obtaining indices for all entries in 'arr' that are part of current
         # cluster.
-        ids = np.where(labels == l)[0]
+        ids = np.where(labels == L)[0]
         # Checking if current cluster is not an empty cluster (label == -1).
-        if l != -1:
+        if L != -1:
             # Calculated eigenvalues for current cluster.
             e = svd_evals(arr[ids])
             # Assigning current eigenvalues to indices of all points of
             # current cluster in final_evals.
             final_evals[ids] = e
 
+    # Calculate eigenvalues ratio. This standardizes all rows (eigenvalues
+    # of each point) to an interval between 0 and 1. The sum of each row
+    # is 1.
+    ratio = np.asarray([i / np.sum(i) for i in final_evals])
+
     # Mask points by largest eigenvalue (column -0).
-    return final_evals[:, 0] >= eval_threshold
+    return ratio[:, 0] >= eval_threshold
 
 
 def radius_filter(arr, radius, min_points):

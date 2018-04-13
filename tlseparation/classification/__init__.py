@@ -17,17 +17,19 @@
 
 
 __author__ = "Matheus Boni Vicari"
-__copyright__ = "Copyright 2017, TLSeparation Project"
+__copyright__ = "Copyright 2017-2018, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.2.3"
+__version__ = "1.2.2.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
-from .point_features import knn_features
+from .point_features import (knn_features, curvature)
 from .gmm import (classify, class_select_abs, class_select_ref)
 from .path_detection import (detect_main_pathways, voxel_path_detection,
-                             get_base)
+                             path_detect_frequency, get_base)
 from .wlseparation import (wlseparate_abs, wlseparate_ref_voting, fill_class)
+from .classify_wood import (reference_classification,
+                            threshold_classification)
 from .classes_reference import DefaultClass

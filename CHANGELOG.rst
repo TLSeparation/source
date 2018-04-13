@@ -1,3 +1,19 @@
+v1.2.2.5 
+--------
+- Changed *remove_duplicates* function to allow indices output.
+- Temporarily removed *continuous_clustering* module until further improvements.
+- Replaced HDBSCAN for DBSCAN in the entire package. This aims to make installation simpler and avoid incompatibilities.
+- Set full_matrices to False in *svd_evals* to improve processing efficiency (reduced processing time and memory usage).
+- Added new autometed separation script *large_tree_5*.
+- Removed old automated separation scripts: *large_tree_1* and *large_tree_2*.
+- Added new filters: *plane_filter*, *cluster_filter* and *feature_filter*.
+- Added new path detection script, *path_detect_frequency*.
+
+v1.2.2.4
+--------
+- Corrected automated calculation of parameter cf_rad in *large_tree_3*.
+- Added new gmm_nclasses parameter to *large_tree_3*.
+
 v1.2.2.3
 --------
 - Changed *voxel_path_detect* parameters to speed up processing.

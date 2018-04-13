@@ -17,15 +17,58 @@
 
 
 __author__ = "Matheus Boni Vicari"
-__copyright__ = "Copyright 2017, TLSeparation Project"
+__copyright__ = "Copyright 2017-2018, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.2.3"
+__version__ = "1.2.2.5"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
 import numpy as np
+
+
+def curvature(arr, nbrs_idx):
+
+    """
+    Calculates pointwise curvature of a point cloud.
+
+    Parameters
+    ----------
+    arr : array
+        Three-dimensional (m x n) array of a point cloud, where the
+        coordinates are represented in the columns (n) and the points are
+        represented in the rows (m).
+    nbr_idx : array
+        N-dimensional array of indices from a nearest neighbors search of the
+        point cloud in 'arr', where the rows (m) represents the points in
+        'arr' and the columns represents the indices of the nearest neighbors
+        from 'arr'.
+
+    Returns
+    -------
+    c : numpy.ndarray
+        1D (m x 1) array containing the curvature of each point in 'arr'.
+
+    """
+
+    # Allocating eigenvalues (evals) as array with shape n_points x 3 filled
+    # with zeros.
+    evals = np.zeros([arr.shape[0], 3], dtype=float)
+
+    # Looping over each set of neighbors in nbrs_idx.
+    for i, nids in enumerate(nbrs_idx):
+        # Checking if local neighborhood of points contains more than 3
+        # points. Otherwise, the calculation of eigenvalues/eigenvectors
+        # is not possible.
+        if arr[nids].shape[0] > 3:
+            # Calculates ith eigenvalues using svd_evals.
+            evals[i] = svd_evals(arr[nids])
+
+    # Calculating curvature.
+    c = evals[:, 2] / np.sum(evals, axis=1)
+
+    return c
 
 
 def knn_features(arr, nbr_idx, block_size=200000):
@@ -224,6 +267,6 @@ def svd_evals(arr):
     centroid = np.average(arr, axis=0)
 
     # Running SVD on centered points from 'arr'.
-    _, evals, evecs = np.linalg.svd(arr - centroid)
+    _, evals, evecs = np.linalg.svd(arr - centroid, full_matrices=False)
 
     return evals
