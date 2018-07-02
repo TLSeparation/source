@@ -7,4 +7,5 @@ Python package
 ~~~~~~~~~~~~~~
 - Improve *continuity_filter*;
 - Add logging options;
-- Remove HDBSCAN module from package, use DBSCAN instead;
+- Change path frequency detection threshold to [np.max(np.log(c)) / 2];
+- Change radius thresholds from frequency path detection;

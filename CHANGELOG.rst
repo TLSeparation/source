@@ -1,3 +1,13 @@
+v1.2.2.7 
+--------
+- Minor changes mainly to update for a new stable version.
+
+v1.2.2.6 
+--------
+- Removed 'future_code' from the package. These codes will be kept aside until they are ready to be added back into the package.
+- Completely removed all references for *HDBSCAN* which caused import errors.
+- Renamed *automated_separation.large_tree_5* to *automated_separation.generic_tree*.
+
 v1.2.2.5 
 --------
 - Changed *remove_duplicates* function to allow indices output.

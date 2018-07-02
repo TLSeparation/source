@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017-2018, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.2.5"
+__version__ = "1.2.2.7"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -142,8 +142,9 @@ def cluster_filter(arr, max_dist, eval_threshold):
         # Obtaining indices for all entries in 'arr' that are part of current
         # cluster.
         ids = np.where(labels == L)[0]
-        # Checking if current cluster is not an empty cluster (label == -1).
-        if L != -1:
+        # Checking if current cluster is not an empty cluster (label == -1)
+        # and if current cluster has more than 3 points.
+        if (L != -1) & len(ids) >= 3:
             # Calculated eigenvalues for current cluster.
             e = svd_evals(arr[ids])
             # Assigning current eigenvalues to indices of all points of

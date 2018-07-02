@@ -1,4 +1,4 @@
-# Copyright (c) 2017, Matheus Boni Vicari, TLSeparation Project
+d# Copyright (c) 2017, Matheus Boni Vicari, TLSeparation Project
 # All rights reserved.
 #
 #
@@ -20,13 +20,12 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017-2018, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.2.5"
+__version__ = "1.2.2.7"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
 from .shortpath import (array_to_graph, extract_path_info)
-from .continuous_clustering import path_clustering
 from .knnsearch import *
 from .data_utils import *
 from .filtering import *

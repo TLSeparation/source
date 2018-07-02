@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017-2018, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari", "Phil Wilkes"]
 __license__ = "GPL3"
-__version__ = "1.2.2.5"
+__version__ = "1.2.2.7"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -626,7 +626,7 @@ path filtering')
     return wood_final, leaf_final
 
 
-def large_tree_5(arr, knn_list=[40, 50, 80, 120, 100], voxel_size=0.05,
+def generic_tree(arr, knn_list=[40, 50, 80, 120, 100], voxel_size=0.05,
                  retrace_steps=40):
 
     """
