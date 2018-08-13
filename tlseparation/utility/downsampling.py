@@ -1,4 +1,4 @@
-rimport numpy as np
+import numpy as np
 from scipy.spatial.distance import cdist
 
 
@@ -24,7 +24,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017-2018, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.2.2.7"
+__version__ = "1.3"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
