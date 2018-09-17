@@ -1,3 +1,11 @@
+v1.3.1
+------
+- Bug fix in 'generic_tree' script. Now 'path_detect_frequency' also uses the voxel size defined in the main script.
+
+v1.3
+----
+- Major bump in version to point out operational status after series of minor improvements.
+
 v1.2.2.7 
 --------
 - Minor changes mainly to update for a new stable version.

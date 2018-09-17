@@ -20,7 +20,7 @@ __author__ = "Matheus Boni Vicari"
 __copyright__ = "Copyright 2017-2018, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari", "Phil Wilkes"]
 __license__ = "GPL3"
-__version__ = "1.3"
+__version__ = "1.3.1"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -626,7 +626,7 @@ path filtering')
     return wood_final, leaf_final
 
 
-def generic_tree(arr, knn_list=[40, 50, 80, 120, 100], voxel_size=0.05,
+def generic_tree(arr, knn_list=[40, 50, 80, 100, 120], voxel_size=0.05,
                  retrace_steps=40):
 
     """
@@ -677,7 +677,7 @@ def generic_tree(arr, knn_list=[40, 50, 80, 120, 100], voxel_size=0.05,
     # low order branches) in a tree point cloud. This step generates a
     # graph from the point cloud and select nodes with high frequency
     # of paths passing through.
-    path_frequency_arr = path_detect_frequency(arr, 0.05, 6)
+    path_frequency_arr = path_detect_frequency(arr, voxel_size, 6)
     # Running threshold_classification to detect small branches.
     wood_abs = threshold_classification(arr, np.min(knn_list))
     # Running reference_classification to detect both trunk, medium branches
