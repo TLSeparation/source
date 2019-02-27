@@ -1,4 +1,4 @@
-# Copyright (c) 2017, Matheus Boni Vicari, TLSeparation Project
+# Copyright (c) 2017-2019, Matheus Boni Vicari, TLSeparation Project
 # All rights reserved.
 #
 #
@@ -17,10 +17,10 @@
 
 
 __author__ = "Matheus Boni Vicari"
-__copyright__ = "Copyright 2017-2018, TLSeparation Project"
+__copyright__ = "Copyright 2017-2019, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari", "Phil Wilkes"]
 __license__ = "GPL3"
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -404,9 +404,6 @@ added/processed (mask)')
     # Appending current_idx to processed_idx.
     processed_idx = np.append(processed_idx, current_idx)
     processed_idx = np.unique(processed_idx).astype(int)
-
-    # Generating list of remaining proints to process.
-    idx = idx_base[np.in1d(idx_base, processed_idx, invert=True)]
 
     # Generating final path mask and setting processed indices as True.
     path_mask = np.zeros(point_cloud.shape[0], dtype=bool)

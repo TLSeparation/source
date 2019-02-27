@@ -1,4 +1,4 @@
-# Copyright (c) 2017, Matheus Boni Vicari, TLSeparation Project
+# Copyright (c) 2017-2019, Matheus Boni Vicari, TLSeparation Project
 # All rights reserved.
 #
 #
@@ -17,10 +17,10 @@
 
 
 __author__ = "Matheus Boni Vicari"
-__copyright__ = "Copyright 2017-2018, TLSeparation Project"
+__copyright__ = "Copyright 2017-2019, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -33,6 +33,117 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import DBSCAN
 from ..classification.point_features import (svd_evals, knn_features,
                                              curvature)
+
+def cluster_size(arr, labels, min_size):
+    
+    """
+    Filters a set of connected components by maximum size on any dimension.
+
+    Parameters
+    ----------
+    arr : array
+        Three-dimensional (m x n) array of a point cloud, where the
+        coordinates are represented in the columns (n) and the points are
+        represented in the rows (m).
+    labels : array
+        1D array with cluster labels assigned to each point from the input
+        point cloud.
+    min_size : int/float
+        Minimum size, on any dimension, for a cluster to be set as
+        valid (True)
+        
+    Returns
+    -------
+    filter_mask : array
+        1D mask array setting True for valid poins in 'arr' and False
+        otherwise.
+        
+    """
+    
+    # Initializes mask.
+    filter_mask = np.zeros(labels.shape[0], dtype=int)
+    # Loops over each cluster label.
+    for l in np.unique(labels):
+        # Masks indices of current cluster.
+        mask = l == labels
+        # Selects point from current cluster.
+        cluster_points = arr[mask]
+        # Calculates the size of the current cluster in all dimensions.
+        cluster_size = (np.max(cluster_points, axis=0).astype(float) -
+                        np.min(cluster_points, axis=0))
+        # Checks if cluster has at least one dimension with size larger then
+        # min_size and, if so, assign a True (1) value to filter mask for
+        # points that are part of the current cluster.
+        if np.max(cluster_size) > min_size:
+            filter_mask[mask] = 1
+        
+    return filter_mask.astype(bool)
+
+
+def cluster_features(arr, labels, feature_threshold, min_pts=10):
+    
+    """
+    Filters a set of connected components by a geometric feature threshold.
+    This feature (n 2 in the separation methodology) is used to describe
+    elongated shapes. If the shape of the cluster is elongated enough
+    (i.e. feature value larger than threshold) the points belonging to this
+    cluster are masked as True.
+
+    Parameters
+    ----------
+    arr : array
+        Three-dimensional (m x n) array of a point cloud, where the
+        coordinates are represented in the columns (n) and the points are
+        represented in the rows (m).
+    labels : array
+        1D array with cluster labels assigned to each point from the input
+        point cloud.
+    feature_threshold : float
+        Minimum feature value for the cluster to be set as elongated (True).
+    min_pts : int
+        Minimum number of points for the cluster to be set as valid (True).
+        
+    Returns
+    -------
+    filter_mask : array
+        1D mask array setting True for valid poins in 'arr' and False
+        otherwise.    
+        
+    """
+    
+    # Initializes arrays for mask and eigenvalues ratio.    
+    filter_mask = np.zeros(labels.shape[0], dtype=int)
+    evals_ratio = np.zeros([arr.shape[0], 3])
+    # Loops over each cluster label.
+    for l in np.unique(labels):
+        # Masks indices of current cluster.
+        mask = l == labels
+        # Check if current cluster has at least points, otherwise is not
+        # possible to estimate its eigenvalues
+        if np.sum(mask) >= 3:
+            # Selects point from current cluster.
+            cluster_points = arr[mask]         
+            if cluster_points.shape[0] >= min_pts:
+                # Calculating centroid coordinates of points in
+                # 'cluster_points'.
+                centroid = np.average(cluster_points, axis=0)
+                # Running SVD on centered points from 'cluster_points'.
+                _, evals, _ = np.linalg.svd(cluster_points - centroid,
+                                            full_matrices=False)
+                # Calculating eigenvalues ratio and assigning to the
+                # respective indices of current points to evals_ratio.
+                evals_ratio[mask] = evals / np.sum(evals)
+
+        else:
+            pass
+        
+    # Calculating geometric feature.
+    feature = evals_ratio[:, 0] - evals_ratio[:, 1]
+    # Checking feature values against threshold and masking feature values
+    # larger than threshold as True.
+    filter_mask = feature >= feature_threshold
+    
+    return filter_mask 
 
 
 def feature_filter(arr, feature_id, threshold, knn):

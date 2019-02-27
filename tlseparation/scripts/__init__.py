@@ -1,4 +1,4 @@
-# Copyright (c) 2017, Matheus Boni Vicari, TLSeparation Project
+# Copyright (c) 2017-2019, Matheus Boni Vicari, TLSeparation Project
 # All rights reserved.
 #
 #
@@ -17,13 +17,13 @@
 
 
 __author__ = "Matheus Boni Vicari"
-__copyright__ = "Copyright 2017-2018, TLSeparation Project"
+__copyright__ = "Copyright 2017-2019, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
-
-from .automated_separation import large_tree_3, large_tree_4, generic_tree
+from .automated_separation import large_tree_3, large_tree_4, generic_tree, nopath_generic_tree
+from .post_processing import isolated_clusters

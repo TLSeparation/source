@@ -1,8 +1,4 @@
-import numpy as np
-from scipy.spatial.distance import cdist
-
-
-# Copyright (c) 2017, Matheus Boni Vicari, TLSeparation Project
+# Copyright (c) 2017-2019, Matheus Boni Vicari, TLSeparation Project
 # All rights reserved.
 #
 #
@@ -21,13 +17,16 @@ from scipy.spatial.distance import cdist
 
 
 __author__ = "Matheus Boni Vicari"
-__copyright__ = "Copyright 2017-2018, TLSeparation Project"
+__copyright__ = "Copyright 2017-2019, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari"]
 __license__ = "GPL3"
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
+
+import numpy as np
+from scipy.spatial.distance import cdist
 
 
 def downsample_cloud(point_cloud, downsample_size, return_indices=False,

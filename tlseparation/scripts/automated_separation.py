@@ -1,4 +1,4 @@
-# Copyright (c) 2017, Matheus Boni Vicari, TLSeparation Project
+# Copyright (c) 2017-2019, Matheus Boni Vicari, TLSeparation Project
 # All rights reserved.
 #
 #
@@ -17,10 +17,10 @@
 
 
 __author__ = "Matheus Boni Vicari"
-__copyright__ = "Copyright 2017-2018, TLSeparation Project"
+__copyright__ = "Copyright 2017-2019, TLSeparation Project"
 __credits__ = ["Matheus Boni Vicari", "Phil Wilkes"]
 __license__ = "GPL3"
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 __maintainer__ = "Matheus Boni Vicari"
 __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
@@ -34,7 +34,8 @@ from ..classification import (wlseparate_abs, wlseparate_ref_voting,
 from ..utility import (get_diff, remove_duplicates, radius_filter,
                        class_filter, cluster_filter, continuity_filter,
                        feature_filter, plane_filter,
-                       detect_nn_dist)
+                       detect_nn_dist, cluster_features, cluster_size,
+                       connected_component)
 
 
 def large_tree_3(arr, class_file=[], knn_lst=[20, 40, 60, 80], gmm_nclasses=4,
@@ -711,6 +712,77 @@ def generic_tree(arr, knn_list=[40, 50, 80, 100, 120], voxel_size=0.05,
     # detection.
     wood_final = np.vstack((path_frequency_arr, path_retrace_arr,
                             wood2[mask_plane]))
+    # Removes duplicate points and obtains final leaf points from
+    # the difference set between initial and final wood point clouds.
+    wood_final = remove_duplicates(wood_final)
+    leaf_final = get_diff(arr, wood_final)
+
+    return wood_final, leaf_final
+
+
+def nopath_generic_tree(arr, knn_list=[40, 50, 80, 100, 120]):
+
+    """
+    Run an automated separation of a single tree point cloud.
+
+    Parameters
+    ----------
+    arr : array
+        Three-dimensional point cloud of a single tree to perform the
+        wood-leaf separation. This should be a n-dimensional array (m x n)
+        containing a set of coordinates (n) over a set of points (m).
+    knn_lst: list
+        Set of knn values to use in the neighborhood search in classification
+        steps. This variable will be directly used in a step containing
+        the function reference_classification  and its minimum and maximum
+        values will be used in a different step with threshold_classification
+        (both from classification.classify_wood). These values are directl
+        dependent of point density and were defined based on a medium point
+        density scenario (mean distance between points aroun 0.05m).
+        Therefore, for higher density point clouds it's recommended the use of
+        larger knn values for optimal results.
+
+    Returns
+    -------
+    wood_final : array
+        Wood point cloud.
+    leaf_final : array
+        Leaf point cloud.
+
+    """
+
+    # Running threshold_classification to detect small branches.
+    wood_abs = threshold_classification(arr, np.min(knn_list))
+    # Running reference_classification to detect both trunk, medium branches
+    # and small branches.
+    wood_vote = reference_classification(arr, knn_list)
+    # Stacking classified wood points.
+    wood1 = np.vstack((wood_abs, wood_vote))
+    # Obtaining leaf points by the difference set between wood and initial
+    # point clouds.
+    leaf1 = get_diff(arr, wood1)
+    # Obtaining larger branches that might have been missed in previous
+    # steps. The basic idea is to use a much larger knn value.
+    wood_abs_2 = threshold_classification(leaf1, np.max(knn_list) * 2)
+    # If wood_abs_2 has more than 10 points, do a cluster filtering to
+    # remove cluster with round/flat shapes.
+    if len(wood_abs_2) >= 10:
+        mask_cluster_2 = cluster_filter(wood_abs_2, 0.06, 0.6)
+        wood_abs_2 = wood_abs_2[mask_cluster_2]
+    # Obtaining small branches that might have been missed in previous
+    # steps. To detect small features, the ideal approach is to use a
+    # small neighborhood of points.
+    wood_abs_3 = threshold_classification(leaf1, np.min(knn_list))
+    # Stacking all wood points classified through Gaussian Mixture/EM.
+    wood2 = np.vstack((wood1, wood_abs_2, wood_abs_3))
+    # Removing duplicated points.
+    wood2 = remove_duplicates(wood2)
+    # Applying plane filter to remove points in a plane-ish neighborhood
+    # of points. These plane points are more likely to be part of leaves.
+    mask_plane = plane_filter(wood2, 0.03, 0.02)
+    # Stacking final wood points from GMM classification and path
+    # detection.
+    wood_final = wood2[mask_plane]
     # Removes duplicate points and obtains final leaf points from
     # the difference set between initial and final wood point clouds.
     wood_final = remove_duplicates(wood_final)

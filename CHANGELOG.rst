@@ -1,3 +1,9 @@
+v1.3.2
+------
+- Added a new clustering module containing a 'connected_component' approach.
+- Added two cluster based filtering to be used along 'clustering.connected_component'.
+- Added new script module for automated post-processing.
+
 v1.3.1
 ------
 - Bug fix in 'generic_tree' script. Now 'path_detect_frequency' also uses the voxel size defined in the main script.
