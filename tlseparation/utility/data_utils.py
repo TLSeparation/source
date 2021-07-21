@@ -27,7 +27,7 @@ __status__ = "Development"
 
 import numpy as np
 import pandas as pd
-from knnsearch import set_nbrs_knn
+from .knnsearch import set_nbrs_knn
 
 
 def get_diff(arr1, arr2):

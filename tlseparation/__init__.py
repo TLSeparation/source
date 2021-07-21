@@ -27,6 +27,6 @@ __status__ = "Development"
 
 __all__ = ['classification', 'utility', 'scripts']
 
-import classification
-import utility
-import scripts
+from . import classification
+from . import utility
+from . import scripts

@@ -26,8 +26,8 @@ __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
 import numpy as np
-from knnsearch import (set_nbrs_knn, set_nbrs_rad)
-from peakdetect import peakdet
+from .knnsearch import (set_nbrs_knn, set_nbrs_rad)
+from .peakdetect import peakdet
 
 
 def detect_optimal_knn(arr, rad_lst=[0.1, 0.2, 0.3], sample_size=10000):
