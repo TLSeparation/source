@@ -85,10 +85,10 @@ def path_detect_frequency(point_cloud, downsample_size,
     nodes_ids, D, path_dict = extract_path_info(G, base_id,
                                                 return_path=True)
     # Selecting nodes coordinates
-    nodes = point_cloud[down_ids][nodes_ids]
+    nodes = point_cloud[list(down_ids)][list(nodes_ids)]
     # Unpacking all indices in path_dict and appending them to path_ids_list.
     path_ids_list = []
-    for k, v in path_dict.iteritems():
+    for k, v in path_dict.items():
         path_ids_list.append(v)
     # Flattening path_ids_list.
     path_ids_list = [j for i in path_ids_list for j in i]
@@ -165,7 +165,7 @@ def voxel_path_detection(point_cloud, voxel_size, k_retrace, knn,
         print(str(datetime.datetime.now()) + ' | >>> voxelizing point cloud, \
 with a voxel size of %s' % voxel_size)
     vox = voxelize_cloud(point_cloud, voxel_size=voxel_size)
-    vox_coords = np.asarray(vox.keys())
+    vox_coords = np.asarray(list(vox.keys()))
 
     # Running detect_main_pathways over voxels' coordinates.
     if verbose:
@@ -243,15 +243,15 @@ point cloud and extracting shortest path information')
     nodes_ids, D, path_list = extract_path_info(G, base_id,
                                                 return_path=True)
     # Obtaining nodes coordinates from shortest path information.
-    nodes = point_cloud[nodes_ids]
+    nodes = point_cloud[list(nodes_ids)]
     # Converting list of shortest path distances to array.
-    D = np.asarray(D)
+    D = np.asarray(list(D))
 
     # Retracing path for nodes in G. This step aims to detect only major
     # pathways in G. For a tree, these paths are expected to represent
     # branches and trunk.
     new_id = np.zeros(nodes.shape[0], dtype='int')
-    for key, values in path_list.iteritems():
+    for key, values in path_list.items():
         if len(values) >= k_retrace:
             new_id[key] = values[len(values) - k_retrace]
         else:

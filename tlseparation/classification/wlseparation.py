@@ -171,7 +171,7 @@ def wlseparate_ref_voting(arr, knn_lst, class_file, n_classes=3):
     # Reading in class reference values from file.
     if isinstance(class_file, str):
         class_table = pd.read_csv(class_file)
-        print class_table
+        print(class_table)
     elif isinstance(class_file, pd.core.frame.DataFrame):
         class_table = class_file
     else:

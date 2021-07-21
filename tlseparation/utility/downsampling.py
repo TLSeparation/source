@@ -79,7 +79,7 @@ def downsample_cloud(point_cloud, downsample_size, return_indices=False,
     # length equal to number of voxels.
     pc_downsample_ids = np.zeros(len(voxels.keys()), dtype=int)
     # Looping over each pair of voxel indices and point indices.
-    for i, (vid, pids) in enumerate(voxels.iteritems()):
+    for i, (vid, pids) in enumerate(voxels.items()):
         # Calculating median coordinates of points inside current voxel.
         median_coord = np.median(point_cloud[pids], axis=0)
         # Calculating distance of every point inside current voxel to

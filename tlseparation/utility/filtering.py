@@ -26,9 +26,9 @@ __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
 import numpy as np
-from knnsearch import (set_nbrs_knn, set_nbrs_rad)
-from data_utils import (get_diff, remove_duplicates)
-from shortpath import (array_to_graph, extract_path_info)
+from .knnsearch import (set_nbrs_knn, set_nbrs_rad)
+from .data_utils import (get_diff, remove_duplicates)
+from .shortpath import (array_to_graph, extract_path_info)
 from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import DBSCAN
 from ..classification.point_features import (svd_evals, knn_features,

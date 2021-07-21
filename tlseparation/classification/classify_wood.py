@@ -26,8 +26,8 @@ __email__ = "matheus.boni.vicari@gmail.com"
 __status__ = "Development"
 
 import numpy as np
-from classes_reference import DefaultClass
-from wlseparation import wlseparate_abs, wlseparate_ref_voting
+from .classes_reference import DefaultClass
+from .wlseparation import wlseparate_abs, wlseparate_ref_voting
 from ..utility.filtering import class_filter
 
 
