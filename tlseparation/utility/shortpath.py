@@ -70,128 +70,146 @@ def array_to_graph(arr, base_id, kpairs, knn, nbrs_threshold,
 
     """
 
-    # Initializing graph.
-    G = nx.Graph()
+    # only pass if all points are able to connect to graph
+    not_connected = True
+    iterations = 0
+    while not_connected:
+        not_connected = False
+        iterations += 1
+        knn *= iterations
+#         print('iterations',iterations)
+#         print('knn',knn)
 
-    # Generating array of all indices from 'arr' and all indices to process
-    # 'idx'.
-    idx_base = np.arange(arr.shape[0], dtype=int)
-    idx = np.arange(arr.shape[0], dtype=int)
+        # Initializing graph.
+        G = nx.Graph()
 
-    # Initializing NearestNeighbors search and searching for all 'knn'
-    # neighboring points arround each point in 'arr'.
-    nbrs = NearestNeighbors(n_neighbors=knn, metric='euclidean',
-                            leaf_size=15, n_jobs=-1).fit(arr)
-    distances, indices = nbrs.kneighbors(arr)
-    indices = indices.astype(int)
+        # Generating array of all indices from 'arr' and all indices to process
+        # 'idx'.
+        idx_base = np.arange(arr.shape[0], dtype=int)
+        idx = np.arange(arr.shape[0], dtype=int)
 
-    # Initializing variables for current ids being processed (current_idx)
-    # and all ids already processed (processed_idx).
-    current_idx = [base_id]
-    processed_idx = [base_id]
+        # Initializing NearestNeighbors search and searching for all 'knn'
+        # neighboring points arround each point in 'arr'.
+        nbrs = NearestNeighbors(n_neighbors=knn, metric='euclidean',
+                                leaf_size=15, n_jobs=-1).fit(arr)
+        distances, indices = nbrs.kneighbors(arr)
+        indices = indices.astype(int)
 
-    # Looping while there are still indices (idx) left to process.
-    while idx.shape[0] > 0:
+        # Initializing variables for current ids being processed (current_idx)
+        # and all ids already processed (processed_idx).
+        current_idx = [base_id]
+        processed_idx = [base_id]
 
-        # If current_idx is a list containing several indices.
-        if len(current_idx) > 0:
+        # Looping while there are still indices (idx) left to process.
+        while idx.shape[0] > 0:
 
-            # Selecting NearestNeighbors indices and distances for current
-            # indices being processed.
-            nn = indices[current_idx]
-            dd = distances[current_idx]
+            # If current_idx is a list containing several indices.
+            if len(current_idx) > 0:
 
-            # Masking out indices already contained in processed_idx.
-            mask1 = np.in1d(nn, processed_idx, invert=True).reshape(nn.shape)
+                # Selecting NearestNeighbors indices and distances for current
+                # indices being processed.
+                nn = indices[current_idx]
+                dd = distances[current_idx]
 
-            # Initializing temporary list of nearest neighbors. This list
-            # is latter used to accumulate points that will be added to
-            # processed points list.
-            nntemp = []
+                # Masking out indices already contained in processed_idx.
+                mask1 = np.in1d(nn, processed_idx, invert=True).reshape(nn.shape)
 
-            # Looping over current indices's set of nn points and selecting
-            # knn points that hasn't been added/processed yet (mask1).
-            for i, (n, d, g) in enumerate(zip(nn, dd, current_idx)):
-                nn_idx = n[mask1[i]][0:kpairs+1]
-                dd_idx = d[mask1[i]][0:kpairs+1]
-                nntemp.append(nn_idx)
+                # Initializing temporary list of nearest neighbors. This list
+                # is latter used to accumulate points that will be added to
+                # processed points list.
+                nntemp = []
 
-                # Adding current knn selected points as nodes to graph G.
-                add_nodes(G, g, nn_idx, dd_idx, graph_threshold)
+                # Looping over current indices's set of nn points and selecting
+                # knn points that hasn't been added/processed yet (mask1).
+                for i, (n, d, g) in enumerate(zip(nn, dd, current_idx)):
+                    nn_idx = n[mask1[i]][0:kpairs+1]
+                    dd_idx = d[mask1[i]][0:kpairs+1]
+                    nntemp.append(nn_idx)
 
-            # Obtaining an unique array of points currently being processed.
-            current_idx = np.unique([t2 for t1 in nntemp for t2 in t1])
+                    # Adding current knn selected points as nodes to graph G.
+                    add_nodes(G, g, nn_idx, dd_idx, graph_threshold)
 
-        # If current_idx is an empty list.
-        elif len(current_idx) == 0:
+                # Obtaining an unique array of points currently being processed.
+                current_idx = np.unique([t2 for t1 in nntemp for t2 in t1])
 
-            # Getting NearestNeighbors indices and distance for all indices
-            # that remain to be processed.
-            idx2 = indices[idx]
-            dist2 = distances[idx]
+            # If current_idx is an empty list.
+            elif len(current_idx) == 0:
 
-            # Masking indices in idx2 that have already been processed. The
-            # idea is to connect remaining points to existing graph nodes.
-            mask1 = np.in1d(idx2, processed_idx).reshape(idx2.shape)
-            # Masking neighboring points that are withing threshold distance.
-            mask2 = dist2 < nbrs_threshold
-            # mask1 AND mask2. This will mask only indices that are part of
-            # the graph and within threshold distance.
-            mask = np.logical_and(mask1, mask2)
+                # Getting NearestNeighbors indices and distance for all indices
+                # that remain to be processed.
+                idx2 = indices[idx]
+                dist2 = distances[idx]
 
-            # Getting unique array of indices that match the criteria from
-            # mask1 and mask2.
-            temp_idx = np.unique(np.where(mask)[0])
-            # Assigns remaining indices (idx) matched in temp_idx to
-            # current_idx.
-            current_idx = idx[temp_idx]
+                # Masking indices in idx2 that have already been processed. The
+                # idea is to connect remaining points to existing graph nodes.
+                mask1 = np.in1d(idx2, processed_idx).reshape(idx2.shape)
 
-            # Selecting NearestNeighbors indices and distances for current
-            # indices being processed.
-            nn = indices[current_idx]
-            dd = distances[current_idx]
+                # check to see if mask1 produces empty set. If so, must redo
+                # nearest neighbor search
+                mask1_check = np.unique(np.where(mask1)[0])
+                if mask1_check.shape[0] == 0:
+                    not_connected = True
+                    break
 
-            # Masking points in nn that have already been processed.
-            # This is the oposite approach as above, where points that are
-            # still not in the graph are desired. Now, to make sure the
-            # continuity of the graph is kept, join current remaining indices
-            # to indices already in G.
-            mask = np.in1d(nn, processed_idx, invert=True).reshape(nn.shape)
+                # Masking neighboring points that are withing threshold distance.
+                mask2 = dist2 < nbrs_threshold
+                # mask1 AND mask2. This will mask only indices that are part of
+                # the graph and within threshold distance.
+                mask = np.logical_and(mask1, mask2)
 
-            # Initializing temporary list of nearest neighbors. This list
-            # is latter used to accumulate points that will be added to
-            # processed points list.
-            nntemp = []
+                # Getting unique array of indices that match the criteria from
+                # mask1 and mask2.
+                temp_idx = np.unique(np.where(mask)[0])
+                # Assigns remaining indices (idx) matched in temp_idx to
+                # current_idx.
+                current_idx = idx[temp_idx]
 
-            # Looping over current indices's set of nn points and selecting
-            # knn points that have alreay been added/processed (mask).
-            # Also, to ensure continuity over next iteration, select another
-            # kpairs points from indices that haven't been processed (~mask).
-            for i, (n, d, g) in enumerate(zip(nn, dd, current_idx)):
-                nn_idx = n[mask[i]][0:kpairs+1]
-                dd_idx = d[mask[i]][0:kpairs+1]
+                # Selecting NearestNeighbors indices and distances for current
+                # indices being processed.
+                nn = indices[current_idx]
+                dd = distances[current_idx]
 
-                # Adding current knn selected points as nodes to graph G.
-                add_nodes(G, g, nn_idx, dd_idx, graph_threshold)
+                # Masking points in nn that have already been processed.
+                # This is the oposite approach as above, where points that are
+                # still not in the graph are desired. Now, to make sure the
+                # continuity of the graph is kept, join current remaining indices
+                # to indices already in G.
+                mask = np.in1d(nn, processed_idx, invert=True).reshape(nn.shape)
 
-                nn_idx = n[~mask[i]][0:kpairs+1]
-                dd_idx = d[~mask[i]][0:kpairs+1]
+                # Initializing temporary list of nearest neighbors. This list
+                # is latter used to accumulate points that will be added to
+                # processed points list.
+                nntemp = []
 
-                # Adding current knn selected points as nodes to graph G.
-                add_nodes(G, g, nn_idx, dd_idx, graph_threshold)
+                # Looping over current indices's set of nn points and selecting
+                # knn points that have alreay been added/processed (mask).
+                # Also, to ensure continuity over next iteration, select another
+                # kpairs points from indices that haven't been processed (~mask).
+                for i, (n, d, g) in enumerate(zip(nn, dd, current_idx)):
+                    nn_idx = n[mask[i]][0:kpairs+1]
+                    dd_idx = d[mask[i]][0:kpairs+1]
 
-            # Check if current_idx is still empty. If so, increase the
-            # nbrs_threshold to try to include more points in the next
-            # iteration.
-            if len(current_idx) == 0:
-                nbrs_threshold += nbrs_threshold_step
+                    # Adding current knn selected points as nodes to graph G.
+                    add_nodes(G, g, nn_idx, dd_idx, graph_threshold)
 
-        # Appending current_idx to processed_idx.
-        processed_idx = np.append(processed_idx, current_idx)
-        processed_idx = np.unique(processed_idx).astype(int)
+                    nn_idx = n[~mask[i]][0:kpairs+1]
+                    dd_idx = d[~mask[i]][0:kpairs+1]
 
-        # Generating list of remaining proints to process.
-        idx = idx_base[np.in1d(idx_base, processed_idx, invert=True)]
+                    # Adding current knn selected points as nodes to graph G.
+                    add_nodes(G, g, nn_idx, dd_idx, graph_threshold)
+
+                # Check if current_idx is still empty. If so, increase the
+                # nbrs_threshold to try to include more points in the next
+                # iteration.
+                if len(current_idx) == 0:
+                    nbrs_threshold += nbrs_threshold_step
+
+            # Appending current_idx to processed_idx.
+            processed_idx = np.append(processed_idx, current_idx)
+            processed_idx = np.unique(processed_idx).astype(int)
+
+            # Generating list of remaining proints to process.
+            idx = idx_base[np.in1d(idx_base, processed_idx, invert=True)]
 
     return G
 
