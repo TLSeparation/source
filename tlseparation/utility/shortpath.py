@@ -77,8 +77,8 @@ def array_to_graph(arr, base_id, kpairs, knn, nbrs_threshold,
         not_connected = False
         iterations += 1
         knn *= iterations
-        print('iterations',iterations)
-        print('knn',knn)
+#         print('iterations',iterations)
+#         print('knn',knn)
 
         # Initializing graph.
         G = nx.Graph()
